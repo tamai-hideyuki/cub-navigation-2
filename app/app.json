@@ -1,0 +1,40 @@
+{
+  "expo": {
+    "name": "CubNavigation2",
+    "slug": "cub-navigation-2",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "dev.testmap.cubnavigation2",
+      "infoPlist": {
+        "UIBackgroundModes": [
+          "location",
+          "audio"
+        ],
+        "CFBundleDisplayName": "カブナビ2"
+      }
+    },
+    "plugins": [
+      [
+        "expo-location",
+        {
+          "isIosBackgroundLocationEnabled": true,
+          "locationAlwaysAndWhenInUsePermission": "画面ロック中も現在地で案内するために使います",
+          "locationWhenInUsePermission": "現在地で案内するために使います"
+        }
+      ],
+      [
+        "expo-audio",
+        {
+          "enableBackgroundPlayback": true,
+          "enableBackgroundRecording": false
+        }
+      ],
+      "expo-asset",
+      "@maplibre/maplibre-react-native"
+    ]
+  }
+}

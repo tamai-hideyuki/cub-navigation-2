@@ -1,0 +1,14 @@
+exports[`リグレッション: 画面の文 1`] = `
+{
+  "出発前": {
+    "progress": "進んだ距離 — / 2.0 km",
+    "routePosition": "ルートとの位置 まだ合っていない（—）",
+    "nextManeuver": "次 —"
+  },
+  "走行中": {
+    "progress": "進んだ距離 0.5 km / 2.0 km",
+    "routePosition": "ルートとの位置 ルート上（12 m）",
+    "nextManeuver": "次  まで 0.5 km"
+  }
+}
+`;

@@ -1,0 +1,94 @@
+# カブナビ2（app）
+
+cub-navigation-2 の iPhone アプリ。今は PoC 5（端末の中で Valhalla を動かす。設計書 8 章）の画面だけがある。
+
+## 中身
+
+| 場所 | 中身 |
+|---|---|
+| `modules/cub-routing/` | Valhalla（[valhalla-mobile](https://github.com/Rallista/valhalla-mobile) 0.6.6）を包む Expo のモジュール。Swift Package を React Native の `spm_dependency` で取り込む |
+| `src/routing/` | Valhalla に渡すルートの要求を組み立てる（計算の条件は設計書 2.1） |
+| `src/navigation/` | ナビの本体（前の版から引き継いだ。Node でテストできる） |
+| `src/poc5/` | PoC 5 の地点の組と、画面ロック中に計算を試す位置のタスク |
+
+## タイルを入れる
+
+ルート用のタイル（`tiles/data/valhalla/valhalla_tiles.tar`、`tiles/` で作る）を、アプリの `Documents/valhalla_tiles.tar` に写す。アプリには同梱しない。
+
+シミュレーター:
+
+```bash
+cp ../tiles/data/valhalla/valhalla_tiles.tar "$(xcrun simctl get_app_container booted dev.testmap.cubnavigation2 data)/Documents/"
+```
+
+実機（iPhone をケーブルでつなぎ、アプリを一度開いてから）:
+
+```bash
+xcrun devicectl device copy to --device <iPhone の UDID> \
+  --domain-type appDataContainer --domain-identifier dev.testmap.cubnavigation2 \
+  --source ../tiles/data/valhalla/valhalla_tiles.tar --destination Documents/valhalla_tiles.tar
+```
+
+## 地図を入れる（PoC 7）
+
+地図用のタイル（`tiles/data/map/kansai.pmtiles`、`tiles/build_map.sh` で作る）とフォント（`tiles/map/fonts/`）を、アプリの `Documents/map/` に写す。
+
+シミュレーター:
+
+```bash
+C="$(xcrun simctl get_app_container booted dev.testmap.cubnavigation2 data)/Documents/map"
+mkdir -p "$C" && cp ../tiles/data/map/kansai.pmtiles "$C/" && cp -R ../tiles/map/fonts "$C/"
+```
+
+実機は `devicectl device copy to` で、`kansai.pmtiles` を `Documents/map/kansai.pmtiles` に、フォントの `.pbf` を1つずつ `Documents/map/fonts/<フォント名>/<範囲>.pbf` に写す。
+
+画面の上の「地図（PoC 7）」で地図が出る。「京都駅までのルートを引く」で、現在地（6府県の外なら大阪駅）から京都駅までのルートを地図に引く。
+
+## 画面（PoC 5）
+
+| ボタン | すること |
+|---|---|
+| 速さを測る | タイルを開き、PoC 4 と同じ 6 組のルートを2回ずつ計算する。距離をパソコンの結果と比べ、計算の時間とメモリを出す |
+| ロック中のテストを始める | 位置の取得を始め、1分に1回ルートを計算して記録に残す。現在地が6府県の外なら、大阪駅 → 京都駅を計算する |
+| 記録を更新 | 下の記録を新しくする |
+
+## 記録
+
+`Documents/navigation-log.txt` に1行1件の JSON で残る。`probe-route` の `appState` が `background` なら、画面ロック中に計算できている。
+
+```bash
+xcrun devicectl device copy from --device <iPhone の UDID> \
+  --domain-type appDataContainer --domain-identifier dev.testmap.cubnavigation2 \
+  --source Documents/navigation-log.txt --destination navigation-log.txt
+```
+
+## ビルド
+
+```bash
+npm install
+npx expo prebuild -p ios
+```
+
+実機に入れるときは、Apple の Team ID を環境変数で渡す（公開しない）。
+
+```bash
+APPLE_TEAM_ID=XXXXXXXXXX npx expo prebuild -p ios --clean
+```
+
+CocoaPods が `Unicode Normalization not appropriate for ASCII-8BIT` で落ちるときは、端末の文字コードを UTF-8 にする（`export LANG=en_US.UTF-8`）。
+
+## 実機でロック中のテストをする（PoC 5）
+
+Debug のアプリは JavaScript を Mac の Metro から読むので、Mac から離れて走ると動かない。実機のテストは Release で入れる（JavaScript がアプリに入る）。
+
+1. iPhone をケーブルでつなぎ、Release で入れる
+
+   ```bash
+   APPLE_TEAM_ID=XXXXXXXXXX npx expo run:ios --device --configuration Release
+   ```
+
+2. アプリを一度開いてから、上の「タイルを入れる」の実機の手順でタイルを写す。画面に「タイル 417MB」と出ることを確かめる
+3. 「速さを測る」を押し、計算の時間とメモリを見る（シミュレーターより遅いはず）
+4. 「ロック中のテストを始める」を押し、位置の許可を「常に」にする
+5. 画面をロックして、30 分ほど持ち歩くか走る
+6. 「記録」の手順で `navigation-log.txt` を取り出し、`probe-route` の `appState` が `background` の行が1分ごとに続いているかを見る

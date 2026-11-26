@@ -1,0 +1,624 @@
+exports[`リグレッション: いろいろな走り方の step の出力 1`] = `
+{
+  "ルートどおり": [
+    {
+      "clipIds": [
+        "common-start"
+      ],
+      "distanceAlongMeters": 0,
+      "offRoute": "on",
+      "nextManeuverId": "turn-000"
+    },
+    {
+      "clipIds": [],
+      "distanceAlongMeters": 25,
+      "offRoute": "on",
+      "nextManeuverId": "turn-000"
+    },
+    {
+      "clipIds": [],
+      "distanceAlongMeters": 50,
+      "offRoute": "on",
+      "nextManeuverId": "turn-000"
+    },
+    {
+      "clipIds": [],
+      "distanceAlongMeters": 75,
+      "offRoute": "on",
+      "nextManeuverId": "turn-000"
+    },
+    {
+      "clipIds": [],
+      "distanceAlongMeters": 100,
+      "offRoute": "on",
+      "nextManeuverId": "turn-000"
+    },
+    {
+      "clipIds": [],
+      "distanceAlongMeters": 125,
+      "offRoute": "on",
+      "nextManeuverId": "turn-000"
+    },
+    {
+      "clipIds": [],
+      "distanceAlongMeters": 150,
+      "offRoute": "on",
+      "nextManeuverId": "turn-000"
+    },
+    {
+      "clipIds": [],
+      "distanceAlongMeters": 175,
+      "offRoute": "on",
+      "nextManeuverId": "turn-000"
+    },
+    {
+      "clipIds": [],
+      "distanceAlongMeters": 200,
+      "offRoute": "on",
+      "nextManeuverId": "turn-000"
+    },
+    {
+      "clipIds": [],
+      "distanceAlongMeters": 225,
+      "offRoute": "on",
+      "nextManeuverId": "turn-000"
+    },
+    {
+      "clipIds": [],
+      "distanceAlongMeters": 250,
+      "offRoute": "on",
+      "nextManeuverId": "turn-000"
+    },
+    {
+      "clipIds": [],
+      "distanceAlongMeters": 275,
+      "offRoute": "on",
+      "nextManeuverId": "turn-000"
+    },
+    {
+      "clipIds": [],
+      "distanceAlongMeters": 300,
+      "offRoute": "on",
+      "nextManeuverId": "turn-000"
+    },
+    {
+      "clipIds": [],
+      "distanceAlongMeters": 325,
+      "offRoute": "on",
+      "nextManeuverId": "turn-000"
+    },
+    {
+      "clipIds": [],
+      "distanceAlongMeters": 350,
+      "offRoute": "on",
+      "nextManeuverId": "turn-000"
+    },
+    {
+      "clipIds": [],
+      "distanceAlongMeters": 375,
+      "offRoute": "on",
+      "nextManeuverId": "turn-000"
+    },
+    {
+      "clipIds": [],
+      "distanceAlongMeters": 400,
+      "offRoute": "on",
+      "nextManeuverId": "turn-000"
+    },
+    {
+      "clipIds": [],
+      "distanceAlongMeters": 425,
+      "offRoute": "on",
+      "nextManeuverId": "turn-000"
+    },
+    {
+      "clipIds": [],
+      "distanceAlongMeters": 450,
+      "offRoute": "on",
+      "nextManeuverId": "turn-000"
+    },
+    {
+      "clipIds": [],
+      "distanceAlongMeters": 475,
+      "offRoute": "on",
+      "nextManeuverId": "turn-000"
+    },
+    {
+      "clipIds": [],
+      "distanceAlongMeters": 500,
+      "offRoute": "on",
+      "nextManeuverId": "turn-000"
+    },
+    {
+      "clipIds": [],
+      "distanceAlongMeters": 525,
+      "offRoute": "on",
+      "nextManeuverId": "turn-000"
+    },
+    {
+      "clipIds": [],
+      "distanceAlongMeters": 550,
+      "offRoute": "on",
+      "nextManeuverId": "turn-000"
+    },
+    {
+      "clipIds": [],
+      "distanceAlongMeters": 575,
+      "offRoute": "on",
+      "nextManeuverId": "turn-000"
+    },
+    {
+      "clipIds": [],
+      "distanceAlongMeters": 600,
+      "offRoute": "on",
+      "nextManeuverId": "turn-000"
+    },
+    {
+      "clipIds": [],
+      "distanceAlongMeters": 625,
+      "offRoute": "on",
+      "nextManeuverId": "turn-000"
+    },
+    {
+      "clipIds": [],
+      "distanceAlongMeters": 650,
+      "offRoute": "on",
+      "nextManeuverId": "turn-000"
+    },
+    {
+      "clipIds": [],
+      "distanceAlongMeters": 675,
+      "offRoute": "on",
+      "nextManeuverId": "turn-000"
+    },
+    {
+      "clipIds": [],
+      "distanceAlongMeters": 700,
+      "offRoute": "on",
+      "nextManeuverId": "turn-000"
+    },
+    {
+      "clipIds": [
+        "turn-000-far"
+      ],
+      "distanceAlongMeters": 725,
+      "offRoute": "on",
+      "nextManeuverId": "turn-000"
+    },
+    {
+      "clipIds": [],
+      "distanceAlongMeters": 750,
+      "offRoute": "on",
+      "nextManeuverId": "turn-000"
+    },
+    {
+      "clipIds": [],
+      "distanceAlongMeters": 775,
+      "offRoute": "on",
+      "nextManeuverId": "turn-000"
+    },
+    {
+      "clipIds": [],
+      "distanceAlongMeters": 800,
+      "offRoute": "on",
+      "nextManeuverId": "turn-000"
+    },
+    {
+      "clipIds": [],
+      "distanceAlongMeters": 825,
+      "offRoute": "on",
+      "nextManeuverId": "turn-000"
+    },
+    {
+      "clipIds": [],
+      "distanceAlongMeters": 850,
+      "offRoute": "on",
+      "nextManeuverId": "turn-000"
+    },
+    {
+      "clipIds": [],
+      "distanceAlongMeters": 875,
+      "offRoute": "on",
+      "nextManeuverId": "turn-000"
+    },
+    {
+      "clipIds": [],
+      "distanceAlongMeters": 900,
+      "offRoute": "on",
+      "nextManeuverId": "turn-000"
+    },
+    {
+      "clipIds": [],
+      "distanceAlongMeters": 925,
+      "offRoute": "on",
+      "nextManeuverId": "turn-000"
+    },
+    {
+      "clipIds": [
+        "turn-000-near"
+      ],
+      "distanceAlongMeters": 950,
+      "offRoute": "on",
+      "nextManeuverId": "turn-000"
+    },
+    {
+      "clipIds": [],
+      "distanceAlongMeters": 975,
+      "offRoute": "on",
+      "nextManeuverId": "turn-001"
+    },
+    {
+      "clipIds": [],
+      "distanceAlongMeters": 1003,
+      "offRoute": "on",
+      "nextManeuverId": "turn-001"
+    },
+    {
+      "clipIds": [],
+      "distanceAlongMeters": 1025,
+      "offRoute": "on",
+      "nextManeuverId": "turn-001"
+    },
+    {
+      "clipIds": [],
+      "distanceAlongMeters": 1050,
+      "offRoute": "on",
+      "nextManeuverId": "turn-001"
+    },
+    {
+      "clipIds": [],
+      "distanceAlongMeters": 1075,
+      "offRoute": "on",
+      "nextManeuverId": "turn-001"
+    },
+    {
+      "clipIds": [],
+      "distanceAlongMeters": 1100,
+      "offRoute": "on",
+      "nextManeuverId": "turn-001"
+    },
+    {
+      "clipIds": [],
+      "distanceAlongMeters": 1125,
+      "offRoute": "on",
+      "nextManeuverId": "turn-001"
+    },
+    {
+      "clipIds": [],
+      "distanceAlongMeters": 1150,
+      "offRoute": "on",
+      "nextManeuverId": "turn-001"
+    },
+    {
+      "clipIds": [],
+      "distanceAlongMeters": 1175,
+      "offRoute": "on",
+      "nextManeuverId": "turn-001"
+    },
+    {
+      "clipIds": [],
+      "distanceAlongMeters": 1200,
+      "offRoute": "on",
+      "nextManeuverId": "turn-001"
+    },
+    {
+      "clipIds": [],
+      "distanceAlongMeters": 1225,
+      "offRoute": "on",
+      "nextManeuverId": "turn-001"
+    },
+    {
+      "clipIds": [],
+      "distanceAlongMeters": 1250,
+      "offRoute": "on",
+      "nextManeuverId": "turn-001"
+    },
+    {
+      "clipIds": [],
+      "distanceAlongMeters": 1275,
+      "offRoute": "on",
+      "nextManeuverId": "turn-001"
+    },
+    {
+      "clipIds": [],
+      "distanceAlongMeters": 1300,
+      "offRoute": "on",
+      "nextManeuverId": "turn-001"
+    },
+    {
+      "clipIds": [],
+      "distanceAlongMeters": 1325,
+      "offRoute": "on",
+      "nextManeuverId": "turn-001"
+    },
+    {
+      "clipIds": [],
+      "distanceAlongMeters": 1350,
+      "offRoute": "on",
+      "nextManeuverId": "turn-001"
+    },
+    {
+      "clipIds": [],
+      "distanceAlongMeters": 1375,
+      "offRoute": "on",
+      "nextManeuverId": "turn-001"
+    },
+    {
+      "clipIds": [],
+      "distanceAlongMeters": 1400,
+      "offRoute": "on",
+      "nextManeuverId": "turn-001"
+    },
+    {
+      "clipIds": [],
+      "distanceAlongMeters": 1425,
+      "offRoute": "on",
+      "nextManeuverId": "turn-001"
+    },
+    {
+      "clipIds": [],
+      "distanceAlongMeters": 1450,
+      "offRoute": "on",
+      "nextManeuverId": "turn-001"
+    },
+    {
+      "clipIds": [],
+      "distanceAlongMeters": 1475,
+      "offRoute": "on",
+      "nextManeuverId": "turn-001"
+    },
+    {
+      "clipIds": [],
+      "distanceAlongMeters": 1500,
+      "offRoute": "on",
+      "nextManeuverId": "turn-001"
+    },
+    {
+      "clipIds": [],
+      "distanceAlongMeters": 1525,
+      "offRoute": "on",
+      "nextManeuverId": "turn-001"
+    },
+    {
+      "clipIds": [],
+      "distanceAlongMeters": 1550,
+      "offRoute": "on",
+      "nextManeuverId": "turn-001"
+    },
+    {
+      "clipIds": [],
+      "distanceAlongMeters": 1575,
+      "offRoute": "on",
+      "nextManeuverId": "turn-001"
+    },
+    {
+      "clipIds": [],
+      "distanceAlongMeters": 1600,
+      "offRoute": "on",
+      "nextManeuverId": "turn-001"
+    },
+    {
+      "clipIds": [],
+      "distanceAlongMeters": 1625,
+      "offRoute": "on",
+      "nextManeuverId": "turn-001"
+    },
+    {
+      "clipIds": [],
+      "distanceAlongMeters": 1650,
+      "offRoute": "on",
+      "nextManeuverId": "turn-001"
+    },
+    {
+      "clipIds": [],
+      "distanceAlongMeters": 1675,
+      "offRoute": "on",
+      "nextManeuverId": "turn-001"
+    },
+    {
+      "clipIds": [],
+      "distanceAlongMeters": 1700,
+      "offRoute": "on",
+      "nextManeuverId": "turn-001"
+    },
+    {
+      "clipIds": [],
+      "distanceAlongMeters": 1725,
+      "offRoute": "on",
+      "nextManeuverId": "turn-001"
+    },
+    {
+      "clipIds": [],
+      "distanceAlongMeters": 1750,
+      "offRoute": "on",
+      "nextManeuverId": "turn-001"
+    },
+    {
+      "clipIds": [],
+      "distanceAlongMeters": 1775,
+      "offRoute": "on",
+      "nextManeuverId": "turn-001"
+    },
+    {
+      "clipIds": [],
+      "distanceAlongMeters": 1800,
+      "offRoute": "on",
+      "nextManeuverId": "turn-001"
+    },
+    {
+      "clipIds": [],
+      "distanceAlongMeters": 1825,
+      "offRoute": "on",
+      "nextManeuverId": "turn-001"
+    },
+    {
+      "clipIds": [],
+      "distanceAlongMeters": 1850,
+      "offRoute": "on",
+      "nextManeuverId": "turn-001"
+    },
+    {
+      "clipIds": [],
+      "distanceAlongMeters": 1875,
+      "offRoute": "on",
+      "nextManeuverId": "turn-001"
+    },
+    {
+      "clipIds": [],
+      "distanceAlongMeters": 1900,
+      "offRoute": "on",
+      "nextManeuverId": "turn-001"
+    },
+    {
+      "clipIds": [],
+      "distanceAlongMeters": 1925,
+      "offRoute": "on",
+      "nextManeuverId": "turn-001"
+    },
+    {
+      "clipIds": [
+        "common-arrive"
+      ],
+      "distanceAlongMeters": 1950,
+      "offRoute": "on",
+      "nextManeuverId": "turn-001"
+    },
+    {
+      "clipIds": [],
+      "distanceAlongMeters": 1975,
+      "offRoute": "on",
+      "nextManeuverId": null
+    },
+    {
+      "clipIds": [],
+      "distanceAlongMeters": 2000,
+      "offRoute": "on",
+      "nextManeuverId": null
+    }
+  ],
+  "外れて戻る": [
+    {
+      "clipIds": [
+        "common-start"
+      ],
+      "distanceAlongMeters": 0,
+      "offRoute": "on",
+      "nextManeuverId": "turn-000"
+    },
+    {
+      "clipIds": [],
+      "distanceAlongMeters": 100,
+      "offRoute": "on",
+      "nextManeuverId": "turn-000"
+    },
+    {
+      "clipIds": [],
+      "distanceAlongMeters": 100,
+      "offRoute": "suspect",
+      "nextManeuverId": "turn-000"
+    },
+    {
+      "clipIds": [],
+      "distanceAlongMeters": 100,
+      "offRoute": "suspect",
+      "nextManeuverId": "turn-000"
+    },
+    {
+      "clipIds": [
+        "common-offroute"
+      ],
+      "distanceAlongMeters": 100,
+      "offRoute": "off",
+      "nextManeuverId": null
+    },
+    {
+      "clipIds": [],
+      "distanceAlongMeters": 300,
+      "offRoute": "off",
+      "nextManeuverId": null
+    },
+    {
+      "clipIds": [
+        "common-onroute"
+      ],
+      "distanceAlongMeters": 310,
+      "offRoute": "on",
+      "nextManeuverId": "turn-000"
+    },
+    {
+      "clipIds": [],
+      "distanceAlongMeters": 400,
+      "offRoute": "on",
+      "nextManeuverId": "turn-000"
+    }
+  ],
+  "位置が飛ぶ": [
+    {
+      "clipIds": [
+        "common-start"
+      ],
+      "distanceAlongMeters": 0,
+      "offRoute": "on",
+      "nextManeuverId": "turn-000"
+    },
+    {
+      "clipIds": [],
+      "distanceAlongMeters": 100,
+      "offRoute": "on",
+      "nextManeuverId": "turn-000"
+    },
+    {
+      "clipIds": [],
+      "distanceAlongMeters": 500,
+      "offRoute": "on",
+      "nextManeuverId": "turn-000"
+    },
+    {
+      "clipIds": [
+        "turn-000-near"
+      ],
+      "distanceAlongMeters": 960,
+      "offRoute": "on",
+      "nextManeuverId": "turn-000"
+    },
+    {
+      "clipIds": [],
+      "distanceAlongMeters": 1050,
+      "offRoute": "on",
+      "nextManeuverId": "turn-001"
+    },
+    {
+      "clipIds": [
+        "common-arrive"
+      ],
+      "distanceAlongMeters": 1990,
+      "offRoute": "on",
+      "nextManeuverId": "turn-001"
+    }
+  ],
+  "途中から始める": [
+    {
+      "clipIds": [
+        "common-start"
+      ],
+      "distanceAlongMeters": 1500,
+      "offRoute": "on",
+      "nextManeuverId": "turn-001"
+    },
+    {
+      "clipIds": [],
+      "distanceAlongMeters": 1600,
+      "offRoute": "on",
+      "nextManeuverId": "turn-001"
+    },
+    {
+      "clipIds": [
+        "common-arrive"
+      ],
+      "distanceAlongMeters": 1990,
+      "offRoute": "on",
+      "nextManeuverId": "turn-001"
+    }
+  ]
+}
+`;
