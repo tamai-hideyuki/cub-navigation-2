@@ -11,6 +11,21 @@ cub-navigation-2 の iPhone アプリ。今は PoC 5（端末の中で Valhalla 
 | `src/navigation/` | ナビの本体（前の版から引き継いだ。Node でテストできる） |
 | `src/poc5/` | PoC 5 の地点の組と、画面ロック中に計算を試す位置のタスク |
 
+## データを入れる（ふだんはこれだけ）
+
+iPhone をケーブルでつなぎ、ここ（`app/`）で動かす。地図を最新にし（`tiles/update.sh`）、アプリを Release でビルドして入れ、変わったデータだけを写す（設計書 9 章）。
+
+```bash
+npm run iphone
+```
+
+- 地図の更新を飛ばすときは `SKIP_MAP_UPDATE=1 npm run iphone`、作り直しを強いるときは `FORCE=1 npm run iphone`
+- データだけを写すときは、アプリを閉じてから `../tools/install-data.sh`（シミュレーターは `../tools/install-data.sh --simulator`）
+- 初めて入れるときは、アプリを入れて一度開いてから、もう一度動かす（`Documents/` ができてから写す）
+- Docker Desktop を起動しておく（Valhalla のタイルを作る）
+
+下の「タイルを入れる」「地図を入れる」「検索のデータを入れる」は、手で1つずつ写すときの手順。
+
 ## タイルを入れる
 
 ルート用のタイル（`tiles/data/valhalla/valhalla_tiles.tar`、`tiles/` で作る）を、アプリの `Documents/valhalla_tiles.tar` に写す。アプリには同梱しない。

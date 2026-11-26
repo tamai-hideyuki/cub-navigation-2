@@ -5,6 +5,8 @@ import { useCallback, useRef, useState } from 'react';
 import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { enqueueClips } from '../clip-player';
+import { mapDateLabel } from '../data/manifest-check';
+import { readInstalledData } from '../data/manifest';
 import { MAP_TILES_FILE, useOfflineMapStyle } from '../map/offline-map';
 import { ROUTE_COLORS } from '../map/style';
 import { formatArrival, formatDistance, formatDuration } from '../navigation/progress-view';
@@ -24,6 +26,9 @@ export function PlanScreen({ onStarted, onOpenDevelopment }: { onStarted: () => 
   const cameraRef = useRef<CameraRef>(null);
   const [plan, setPlan] = useState<Plan>({ kind: 'none' });
   const [starting, setStarting] = useState(false);
+  // 入っている地図の日付と、足りない・写しかけのファイル（設計書 9.3）
+  const [installed] = useState(readInstalledData);
+  const [openedAtMilliseconds] = useState(Date.now);
 
   const chooseDestination = useCallback(async (destination: Coordinate, destinationName: string | null = null) => {
     setPlan({ kind: 'planning', destination, destinationName });
@@ -120,6 +125,19 @@ export function PlanScreen({ onStarted, onOpenDevelopment }: { onStarted: () => 
 
       <SearchBar onSelect={selectPlace} onOpenDevelopment={onOpenDevelopment} />
 
+      {plan.kind === 'none' && (
+        <View style={styles.dataStatus} pointerEvents="none">
+          {installed.manifest && (
+            <Text style={styles.dataDate}>{mapDateLabel(installed.manifest.osmDate, new Date(openedAtMilliseconds))}</Text>
+          )}
+          {installed.problems.map((problem) => (
+            <Text key={problem} style={styles.dataProblem}>
+              {problem}
+            </Text>
+          ))}
+        </View>
+      )}
+
       {plan.kind !== 'none' && (
         <View style={styles.card}>
           {plan.kind === 'planning' && (
@@ -173,6 +191,9 @@ const styles = StyleSheet.create({
   secondaryButton: { borderRadius: 12, paddingVertical: 14, paddingHorizontal: 16, alignItems: 'center', borderWidth: 1, borderColor: '#B4B2A9' },
   secondaryButtonText: { color: '#2C2C2A', fontSize: 15, fontWeight: '600' },
   dimmed: { opacity: 0.6 },
+  dataStatus: { position: 'absolute', left: 16, right: 16, bottom: 40, alignItems: 'flex-start', gap: 4 },
+  dataDate: { fontSize: 12, color: '#2C2C2A', backgroundColor: '#ffffffcc', borderRadius: 6, paddingVertical: 3, paddingHorizontal: 8, overflow: 'hidden' },
+  dataProblem: { fontSize: 13, color: '#ffffff', backgroundColor: '#A32D2D', borderRadius: 6, paddingVertical: 4, paddingHorizontal: 8, overflow: 'hidden' },
   missing: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 24, gap: 12 },
   missingTitle: { fontSize: 18, fontWeight: '700' },
   missingText: { fontSize: 14, color: '#5F5E5A', textAlign: 'center' },

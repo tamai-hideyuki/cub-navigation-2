@@ -9,6 +9,7 @@ import { AppState } from 'react-native';
 
 import { isOpen, openTiles, route as routeOnDevice } from '../../modules/cub-routing';
 import { enqueueClips, prepareAudio } from '../clip-player';
+import { installedOsmDate } from '../data/manifest';
 import { toLocationReading } from '../location-reading';
 import { writeLog } from '../log';
 import { initialState, step } from '../navigation/navigator';
@@ -20,7 +21,7 @@ import { audioClipIds, routeFromValhalla } from '../routing/route-from-valhalla'
 
 export const TRIP_TASK_NAME = 'cub-navigation-2-trip';
 
-/** 端末の中のタイル（Mac から写す。設計書 9 章でビルドのときに入れるようにする） */
+/** 端末の中のタイル（Mac から tools/install-data.sh で写す。設計書 9 章） */
 export const TILE_EXTRACT_FILE = new File(Paths.document, 'valhalla_tiles.tar');
 const ROUTE_FILE = new File(Paths.document, 'trip-route.json');
 const STATE_FILE = new File(Paths.document, 'trip-state.json');
@@ -50,6 +51,8 @@ export class NoRouteError extends Error {}
 let trip: Trip | null = null;
 let routeCounter = 0;
 let busy = false;
+/** 走行の途中で地図が新しくなった（Mac から写し直した）。次の位置で計算し直す */
+let mapChanged = false;
 
 async function ensureTilesOpen(): Promise<void> {
   if (isOpen()) return;
@@ -75,7 +78,7 @@ export async function planRoute(
   routeCounter++;
   const route = routeFromValhalla(result.response, '目的地まで', {
     engine: 'valhalla',
-    osmDate: 'tiles',
+    osmDate: installedOsmDate(),
     computedAt: `${new Date().toISOString()}#${routeCounter}`,
   });
   writeLog('route-planned', {
@@ -144,6 +147,9 @@ function loadTrip(): Trip | null {
       arrivedAtMilliseconds: rest.arrivedAtMilliseconds ?? null,
       lastRerouteFailed: rest.lastRerouteFailed ?? false,
     };
+    // 保存したルートが前の地図で引いたものなら、新しい地図で引き直す（設計書 9.3）
+    mapChanged = !trip.arrived && route.source.engine === 'valhalla' && route.source.osmDate !== installedOsmDate();
+    if (mapChanged) writeLog('trip-map-changed', { routeOsmDate: route.source.osmDate });
     return trip;
   } catch (error) {
     writeLog('trip-read-error', { message: String(error) });
@@ -218,7 +224,8 @@ async function handleLocations(locations: Location.LocationObject[]): Promise<vo
         writeLog('trip-location-stopped-after-arrival');
         break;
       }
-      if (shouldReroute(trip.state, trip.reroute, reading.timestampMilliseconds, trip.arrived)) {
+      if (mapChanged || shouldReroute(trip.state, trip.reroute, reading.timestampMilliseconds, trip.arrived)) {
+        mapChanged = false;
         const heading = location.coords.heading;
         await reroute(reading, heading !== null && heading >= 0 ? heading : null);
       }
