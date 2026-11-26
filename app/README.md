@@ -44,6 +44,14 @@ mkdir -p "$C" && cp ../tiles/data/map/kansai.pmtiles "$C/" && cp -R ../tiles/map
 
 画面の上の「地図（PoC 7）」で地図が出る。「京都駅までのルートを引く」で、現在地（6府県の外なら大阪駅）から京都駅までのルートを地図に引く。
 
+## 検索のデータを入れる
+
+目的地を名前で探すための検索のデータ（`tiles/data/search/search.sqlite`、`tiles/build_search.py` で作る、約 100MB）を、アプリの `Documents/search/search.sqlite` に写す。
+
+```bash
+xcrun devicectl device copy to --device <UDID> --domain-type appDataContainer --domain-identifier dev.testmap.cubnavigation2 --source ../tiles/data/search/search.sqlite --destination Documents/search/search.sqlite
+```
+
 ## 画面（PoC 5）
 
 | ボタン | すること |

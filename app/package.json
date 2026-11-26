@@ -9,6 +9,7 @@
     "expo-audio": "~58.0.12",
     "expo-file-system": "~58.0.14",
     "expo-location": "~58.0.22",
+    "expo-sqlite": "~58.0.18",
     "expo-status-bar": "~58.0.5",
     "expo-task-manager": "~58.0.14",
     "react": "19.3.0",
@@ -27,8 +28,8 @@
     "ios": "expo run:ios",
     "web": "expo start --web",
     "lint": "expo lint",
-    "test": "node --test src/*.test.ts src/navigation/*.test.ts src/routing/*.test.ts src/map/*.test.ts src/voice/*.test.ts src/poc6/*.test.ts",
-    "test:update-snapshots": "node --test --test-update-snapshots src/*.test.ts src/navigation/*.test.ts src/routing/*.test.ts src/map/*.test.ts src/voice/*.test.ts src/poc6/*.test.ts",
+    "test": "node --test src/*.test.ts src/navigation/*.test.ts src/routing/*.test.ts src/map/*.test.ts src/search/*.test.ts src/voice/*.test.ts src/poc6/*.test.ts",
+    "test:update-snapshots": "node --test --test-update-snapshots src/*.test.ts src/navigation/*.test.ts src/routing/*.test.ts src/map/*.test.ts src/search/*.test.ts src/voice/*.test.ts src/poc6/*.test.ts",
     "format": "npx --yes prettier@3.6.2 --write \"*.tsx\" \"*.ts\" \"src/**/*.ts\" \"modules/**/*.ts\""
   },
   "private": true

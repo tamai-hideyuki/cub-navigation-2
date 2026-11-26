@@ -1,4 +1,4 @@
-// 目的地を決める画面とルートの下見（設計書 5.1）。地図を長押しして目的地を決めると、その場でルートを計算する
+// 目的地を決める画面とルートの下見（設計書 5.1）。名前で探すか、地図を長押しして目的地を決めると、その場でルートを計算する
 import { Camera, GeoJSONSource, Layer, Map, UserLocation, type CameraRef } from '@maplibre/maplibre-react-native';
 import * as Location from 'expo-location';
 import { useCallback, useRef, useState } from 'react';
@@ -9,13 +9,15 @@ import { MAP_TILES_FILE, useOfflineMapStyle } from '../map/offline-map';
 import { ROUTE_COLORS } from '../map/style';
 import { formatArrival, formatDistance, formatDuration } from '../navigation/progress-view';
 import type { Coordinate } from '../routing/request';
+import type { RankedPlace } from '../search/ranking';
 import { NoRouteError, planRoute, startTrip, TILE_EXTRACT_FILE, type PlannedRoute } from '../trip/trip-runner';
+import { SearchBar } from './SearchBar';
 
 type Plan =
   | { kind: 'none' }
-  | { kind: 'planning'; destination: Coordinate }
-  | { kind: 'ready'; destination: Coordinate; planned: PlannedRoute; plannedAtMilliseconds: number }
-  | { kind: 'failed'; destination: Coordinate; message: string };
+  | { kind: 'planning'; destination: Coordinate; destinationName: string | null }
+  | { kind: 'ready'; destination: Coordinate; destinationName: string | null; planned: PlannedRoute; plannedAtMilliseconds: number }
+  | { kind: 'failed'; destination: Coordinate; destinationName: string | null; message: string };
 
 export function PlanScreen({ onStarted, onOpenDevelopment }: { onStarted: () => void; onOpenDevelopment: () => void }) {
   const mapStyle = useOfflineMapStyle();
@@ -23,8 +25,8 @@ export function PlanScreen({ onStarted, onOpenDevelopment }: { onStarted: () => 
   const [plan, setPlan] = useState<Plan>({ kind: 'none' });
   const [starting, setStarting] = useState(false);
 
-  const chooseDestination = useCallback(async (destination: Coordinate) => {
-    setPlan({ kind: 'planning', destination });
+  const chooseDestination = useCallback(async (destination: Coordinate, destinationName: string | null = null) => {
+    setPlan({ kind: 'planning', destination, destinationName });
     try {
       const position = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.High });
       const planned = await planRoute(
@@ -32,7 +34,7 @@ export function PlanScreen({ onStarted, onOpenDevelopment }: { onStarted: () => 
         destination,
         position.coords.heading !== null && position.coords.heading >= 0 ? position.coords.heading : null,
       );
-      setPlan({ kind: 'ready', destination, planned, plannedAtMilliseconds: Date.now() });
+      setPlan({ kind: 'ready', destination, destinationName, planned, plannedAtMilliseconds: Date.now() });
       const longitudes = planned.route.geometry.map(([longitude]) => longitude);
       const latitudes = planned.route.geometry.map(([, latitude]) => latitude);
       cameraRef.current?.fitBounds(
@@ -41,13 +43,21 @@ export function PlanScreen({ onStarted, onOpenDevelopment }: { onStarted: () => 
       );
     } catch (error) {
       if (error instanceof NoRouteError) {
-        setPlan({ kind: 'failed', destination, message: 'この目的地へは、125cc では行けません（または範囲の外です）' });
+        setPlan({ kind: 'failed', destination, destinationName, message: 'この目的地へは、125cc では行けません（または範囲の外です）' });
         await enqueueClips(['common-unreachable']);
       } else {
-        setPlan({ kind: 'failed', destination, message: `ルートを計算できませんでした: ${String(error)}` });
+        setPlan({ kind: 'failed', destination, destinationName, message: `ルートを計算できませんでした: ${String(error)}` });
       }
     }
   }, []);
+
+  const selectPlace = useCallback(
+    (place: RankedPlace) => {
+      cameraRef.current?.flyTo({ center: [place.longitude, place.latitude], zoom: 15, duration: 600 });
+      chooseDestination({ longitude: place.longitude, latitude: place.latitude }, place.name);
+    },
+    [chooseDestination],
+  );
 
   const start = useCallback(async () => {
     if (plan.kind !== 'ready') return;
@@ -56,7 +66,7 @@ export function PlanScreen({ onStarted, onOpenDevelopment }: { onStarted: () => 
       await startTrip(plan.destination, plan.planned);
       onStarted();
     } catch (error) {
-      setPlan({ kind: 'failed', destination: plan.destination, message: String(error) });
+      setPlan({ kind: 'failed', destination: plan.destination, destinationName: plan.destinationName, message: String(error) });
     } finally {
       setStarting(false);
     }
@@ -108,12 +118,7 @@ export function PlanScreen({ onStarted, onOpenDevelopment }: { onStarted: () => 
         )}
       </Map>
 
-      <View style={styles.topBar}>
-        <Text style={styles.hint}>{plan.kind === 'none' ? '地図を長押しして目的地を決める' : ' '}</Text>
-        <Pressable accessibilityRole="button" onPress={onOpenDevelopment} style={styles.developmentButton}>
-          <Text style={styles.developmentText}>開発用</Text>
-        </Pressable>
-      </View>
+      <SearchBar onSelect={selectPlace} onOpenDevelopment={onOpenDevelopment} />
 
       {plan.kind !== 'none' && (
         <View style={styles.card}>
@@ -123,6 +128,7 @@ export function PlanScreen({ onStarted, onOpenDevelopment }: { onStarted: () => 
               <Text style={styles.cardText}>ルートを計算しています</Text>
             </View>
           )}
+          {plan.destinationName && <Text style={styles.destinationName} numberOfLines={1}>{plan.destinationName}</Text>}
           {plan.kind === 'ready' && (
             <>
               <Text style={styles.summary}>
@@ -154,12 +160,9 @@ export function PlanScreen({ onStarted, onOpenDevelopment }: { onStarted: () => 
 const styles = StyleSheet.create({
   screen: { flex: 1 },
   map: { flex: 1 },
-  topBar: { position: 'absolute', top: 56, left: 16, right: 16, flexDirection: 'row', alignItems: 'center', gap: 8 },
-  hint: { flex: 1, fontSize: 15, fontWeight: '600', color: '#2C2C2A', backgroundColor: '#ffffffdd', borderRadius: 8, paddingVertical: 8, paddingHorizontal: 12, overflow: 'hidden' },
-  developmentButton: { backgroundColor: '#ffffffdd', borderRadius: 8, paddingVertical: 8, paddingHorizontal: 12 },
-  developmentText: { fontSize: 13, color: '#185FA5', fontWeight: '600' },
   card: { position: 'absolute', left: 16, right: 16, bottom: 32, backgroundColor: '#ffffff', borderRadius: 16, padding: 16, gap: 6 },
   cardRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  destinationName: { fontSize: 15, fontWeight: '600', color: '#185FA5' },
   summary: { fontSize: 26, fontWeight: '700', color: '#2C2C2A' },
   cardText: { fontSize: 15, color: '#5F5E5A' },
   safe: { fontSize: 13, color: '#3B6D11' },
