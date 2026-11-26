@@ -1,0 +1,24 @@
+# 地図のデータと作った物（大きい・作り直せる）
+tiles/data/
+tiles/.venv/
+__pycache__/
+.DS_Store
+
+# 地図データを tiles/data/ の外に置いてしまったときの保険
+*.osm.pbf
+*.tar
+*.pmtiles
+*.mbtiles
+
+# アプリ（Expo）
+node_modules/
+.expo/
+app/ios/
+app/android/
+# アプリに入れるルート用・地図用のタイル（tiles/ で作る）
+app/assets/tiles/
+app/assets/map/
+
+# 秘密の値・手元だけの設定
+.env*
+.claude/settings.local.json
