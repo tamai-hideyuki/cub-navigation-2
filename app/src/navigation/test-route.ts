@@ -42,7 +42,7 @@ function buildTestRoute(): Route {
         clips: { near: 'common-arrive' },
       },
     ],
-    source: { graphhopperVersion: 'test', osmDate: 'test', computedAt: 'test' },
+    source: { engine: 'test', osmDate: 'test', computedAt: 'test' },
   };
 }
 
@@ -105,6 +105,6 @@ export function straightTestRoute(lengthMeters: number, maneuverEveryMeters: num
     geometry: geometry,
     cumulativeMeters: cumulativeMeters,
     maneuvers: maneuvers,
-    source: { graphhopperVersion: 'test', osmDate: 'test', computedAt: 'straight' },
+    source: { engine: 'test', osmDate: 'test', computedAt: 'straight' },
   };
 }

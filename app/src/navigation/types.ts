@@ -39,7 +39,10 @@ export type Route = {
   geometry: [number, number][]; // [経度, 緯度]
   cumulativeMeters: number[]; // geometry[i] までの道なりの距離
   maneuvers: Maneuver[];
-  source: { graphhopperVersion: string; osmDate: string; computedAt: string };
+  /** どこで作ったルートか。computedAt はルートごとに違う値にする（保存した進み具合がどのルートのものかを見分ける） */
+  source: { engine: string; osmDate: string; computedAt: string };
+  /** 案内の ID（turn-0003-far など）→ 鳴らす声のファイルの ID（joined-far-left など）。無い ID はそのまま鳴らす */
+  clipAudio?: Record<ClipId, ClipId>;
 };
 
 export type ProgressState = {

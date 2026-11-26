@@ -1,0 +1,253 @@
+{
+ "trip": {
+  "locations": [
+   {
+    "type": "break",
+    "lat": 35.022,
+    "lon": 135.96,
+    "original_index": 0
+   },
+   {
+    "type": "break",
+    "lat": 35.014,
+    "lon": 136.058,
+    "original_index": 1
+   }
+  ],
+  "legs": [
+   {
+    "maneuvers": [
+     {
+      "type": 1,
+      "instruction": "南西方向です。",
+      "verbal_succinct_transition_instruction": "南西方向です。。その先右方向です。",
+      "verbal_pre_transition_instruction": "南西方向です。。その先右方向です。",
+      "verbal_post_transition_instruction": "40メートル直進です。",
+      "bearing_after": 213,
+      "time": 12.96,
+      "length": 0.036,
+      "cost": 15.876,
+      "begin_shape_index": 0,
+      "end_shape_index": 1,
+      "verbal_multi_cue": true,
+      "travel_mode": "drive",
+      "travel_type": "car"
+     },
+     {
+      "type": 10,
+      "instruction": "右方向です。",
+      "verbal_transition_alert_instruction": "右方向です。",
+      "verbal_succinct_transition_instruction": "右方向です。",
+      "verbal_pre_transition_instruction": "右方向です。",
+      "verbal_post_transition_instruction": "200メートル直進です。",
+      "bearing_before": 213,
+      "bearing_after": 304,
+      "time": 51.899,
+      "length": 0.218,
+      "cost": 103.801,
+      "begin_shape_index": 1,
+      "end_shape_index": 15,
+      "travel_mode": "drive",
+      "travel_type": "car"
+     },
+     {
+      "type": 10,
+      "instruction": "右方向です。",
+      "verbal_transition_alert_instruction": "右方向です。",
+      "verbal_succinct_transition_instruction": "右方向です。",
+      "verbal_pre_transition_instruction": "右方向です。",
+      "verbal_post_transition_instruction": "200メートル直進です。",
+      "bearing_before": 309,
+      "bearing_after": 8,
+      "time": 47.576,
+      "length": 0.192,
+      "cost": 129.948,
+      "begin_shape_index": 15,
+      "end_shape_index": 29,
+      "travel_mode": "drive",
+      "travel_type": "car"
+     },
+     {
+      "type": 10,
+      "instruction": "右方向です。その先びわこ通りです。",
+      "verbal_transition_alert_instruction": "右方向です。その先びわこ通りです。",
+      "verbal_succinct_transition_instruction": "右方向です。。その先分岐を右方向です。",
+      "verbal_pre_transition_instruction": "右方向です。その先びわこ通りです。。その先分岐を右方向です。",
+      "verbal_post_transition_instruction": "50メートル直進です。",
+      "street_names": [
+       "びわこ通り"
+      ],
+      "bearing_before": 34,
+      "bearing_after": 121,
+      "time": 13.476,
+      "length": 0.054,
+      "cost": 50.353,
+      "begin_shape_index": 29,
+      "end_shape_index": 31,
+      "verbal_multi_cue": true,
+      "travel_mode": "drive",
+      "travel_type": "car"
+     },
+     {
+      "type": 23,
+      "instruction": "分岐を右方向です。",
+      "verbal_transition_alert_instruction": "分岐を右方向です。",
+      "verbal_pre_transition_instruction": "分岐を右方向です。",
+      "verbal_post_transition_instruction": "200メートル直進です。",
+      "bearing_before": 121,
+      "bearing_after": 122,
+      "time": 27.88,
+      "length": 0.178,
+      "cost": 60.129,
+      "begin_shape_index": 31,
+      "end_shape_index": 36,
+      "travel_mode": "drive",
+      "travel_type": "car"
+     },
+     {
+      "type": 9,
+      "instruction": "右方向です。その先サンサン通りです。",
+      "verbal_transition_alert_instruction": "右方向です。その先サンサン通りです。",
+      "verbal_succinct_transition_instruction": "右方向です。",
+      "verbal_pre_transition_instruction": "右方向です。その先サンサン通りです。",
+      "verbal_post_transition_instruction": "900メートル直進です。",
+      "street_names": [
+       "サンサン通り"
+      ],
+      "bearing_before": 128,
+      "bearing_after": 145,
+      "time": 143.701,
+      "length": 0.904,
+      "cost": 248.332,
+      "begin_shape_index": 36,
+      "end_shape_index": 78,
+      "travel_mode": "drive",
+      "travel_type": "car"
+     },
+     {
+      "type": 15,
+      "instruction": "左方向です。その先1/8/国道1号です。",
+      "verbal_transition_alert_instruction": "左方向です。その先1です。",
+      "verbal_succinct_transition_instruction": "左方向です。",
+      "verbal_pre_transition_instruction": "左方向です。その先1, 8です。",
+      "verbal_post_transition_instruction": "9キロメートル直進です。",
+      "street_names": [
+       "1",
+       "国道1号"
+      ],
+      "begin_street_names": [
+       "1",
+       "8",
+       "国道1号"
+      ],
+      "bearing_before": 123,
+      "bearing_after": 29,
+      "time": 835.306,
+      "length": 8.84,
+      "cost": 955.123,
+      "begin_shape_index": 78,
+      "end_shape_index": 237,
+      "travel_mode": "drive",
+      "travel_type": "car"
+     },
+     {
+      "type": 10,
+      "instruction": "右方向です。",
+      "verbal_transition_alert_instruction": "右方向です。",
+      "verbal_succinct_transition_instruction": "右方向です。",
+      "verbal_pre_transition_instruction": "右方向です。",
+      "verbal_post_transition_instruction": "100メートル直進です。",
+      "bearing_before": 125,
+      "bearing_after": 222,
+      "time": 27.084,
+      "length": 0.117,
+      "cost": 39.586,
+      "begin_shape_index": 237,
+      "end_shape_index": 244,
+      "travel_mode": "drive",
+      "travel_type": "car"
+     },
+     {
+      "type": 15,
+      "instruction": "左方向です。",
+      "verbal_transition_alert_instruction": "左方向です。",
+      "verbal_succinct_transition_instruction": "左方向です。",
+      "verbal_pre_transition_instruction": "左方向です。",
+      "verbal_post_transition_instruction": "200メートル直進です。",
+      "bearing_before": 222,
+      "bearing_after": 122,
+      "time": 29.862,
+      "length": 0.207,
+      "cost": 32.479,
+      "begin_shape_index": 244,
+      "end_shape_index": 251,
+      "travel_mode": "drive",
+      "travel_type": "car"
+     },
+     {
+      "type": 10,
+      "instruction": "右方向です。",
+      "verbal_transition_alert_instruction": "右方向です。",
+      "verbal_succinct_transition_instruction": "右方向です。",
+      "verbal_pre_transition_instruction": "右方向です。",
+      "verbal_post_transition_instruction": "200メートル直進です。",
+      "bearing_before": 133,
+      "bearing_after": 217,
+      "time": 79.559,
+      "length": 0.187,
+      "cost": 622.138,
+      "begin_shape_index": 251,
+      "end_shape_index": 259,
+      "travel_mode": "drive",
+      "travel_type": "car"
+     },
+     {
+      "type": 4,
+      "instruction": "目的地に到着しました。",
+      "verbal_transition_alert_instruction": "まもなく目的地に到着します。",
+      "verbal_pre_transition_instruction": "目的地に到着しました。",
+      "bearing_before": 220,
+      "time": 0.0,
+      "length": 0.0,
+      "cost": 0.0,
+      "begin_shape_index": 259,
+      "end_shape_index": 259,
+      "travel_mode": "drive",
+      "travel_type": "car"
+     }
+    ],
+    "summary": {
+     "has_time_restrictions": false,
+     "has_toll": false,
+     "has_highway": false,
+     "has_ferry": false,
+     "min_lat": 35.014015,
+     "min_lon": 135.957541,
+     "max_lat": 35.03152,
+     "max_lon": 136.059128,
+     "time": 1269.307,
+     "length": 10.933,
+     "cost": 2257.769
+    },
+    "shape": "qeqxaAkjiibGxOhLmIxQi@dAQZcFlLqDnI_FrKkAdDaA|BY~@cLbVeAzBuKhUs@zAi@~@aBO[CoQgMsFeE}D}EkAaB{@kAmC}BeAgAw@u@sCaC{QwMsKcIwBaBbKwWlBaF~Mo\\hR}b@xFqLzGeNpCyE~BwC|CgBnD_AtDWxAOj@Id@Ml@Sf@Uh@]d@]bCkCvk@sx@Zq@ZiAT_ARmAPsA\\}AXeA`@gA|@eBjh@c_AfSc_@~G_OzA{CrKaVtIcPbDwGbA{BrBoExDiJnKwYhEaKfCkHdPsb@lM_]lEkKpPac@bHmR`CwGdEsJsLkHgQiMkNeMgTwS}MgQgJ{KeJoNaMwUyAwCqKeWcHiSsMug@I_@aBgHSkAkAsGwB{LeB}LkWqnC{ByUuAmOiAeMeH{v@}NkcBuRotB}Dib@wEkg@Iq@Y_DuIm~@cO{aBQ}BUaC_@cE_T_bCo@iH{@mJmBoPgCeQkDePaEmP_EmMwEkMy]wcAi@wAgc@ckAmK}XqCuHwDqKkl@wbByBkG}F_Q}u@cvByCmImZc{@cGiRwE}NmMi^iFgNaH}RoH{ScBcF{CaJiE{NaFoRoIa]aEaTwBkMu@eEcDiTeCsQwBqQsB_UsAuQcAyPqBqa@uAw]s@{Mu@}M]kGyAcWa@oHu@aJ[uDiFes@iC_a@s@qKuBc\\qBg[c@aHs@}LcAkQy@cMwGucAsFi{@iPchCeBeX}J{zAq@wJi@qImF}z@}Fq~@a@kGkDin@]sIaBc`@aAo]Y{PUkMFeGVkQn@kSlCoc@nD}e@xEyd@hJom@vEmV^qB`@{A`@}A`Rew@|AaGr@oCpHcWbOwj@~CmL~Iw\\dMse@fZqiA|@iDzIy\\dOck@fRms@|GiWrHgYla@}|ApAyEng@kmBtVq_A`r@kjCjnBcpHrt@uqChTcy@vKad@l@cCn@aC`CkIfb@u}A~[_oAtDsNxNii@v`@g{A|Kea@pM_`@zCyIhgAcbCf@gAjv@mcB`i@kiAfCnDdElC`GpG`GtFjEtFvH`HrFjGvDgJlJgYlJ_\\hEeMlEkJtEeHrLuPvI~HvQzP`UbPdCrAp@\\vInDnEhDhKnK"
+   }
+  ],
+  "summary": {
+   "has_time_restrictions": false,
+   "has_toll": false,
+   "has_highway": false,
+   "has_ferry": false,
+   "min_lat": 35.014015,
+   "min_lon": 135.957541,
+   "max_lat": 35.03152,
+   "max_lon": 136.059128,
+   "time": 1269.307,
+   "length": 10.933,
+   "cost": 2257.769
+  },
+  "status_message": "Found route between points",
+  "status": 0,
+  "units": "kilometers",
+  "language": "ja-JP"
+ }
+}

@@ -1,5 +1,4 @@
-// PoC 5 の画面（設計書 8 章）。端末の中で Valhalla を動かし、計算の速さ・メモリ・ロック中の計算を確かめる。
-// アプリの本当の画面（設計書 5 章）は、PoC が終わってから作り直す
+// アプリの画面（設計書 5 章）。目的地を決める画面 → 走行中の画面。PoC の画面は「開発用」から開く
 import { StatusBar } from 'expo-status-bar';
 import { useCallback, useEffect, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
@@ -8,20 +7,48 @@ import { closeTiles, isOpen, memoryFootprintMegabytes, route } from './modules/c
 import { readLogTail, writeLog } from './src/log';
 import { ensureTilesOpen, isProbing, startProbe, stopProbe, TILE_EXTRACT_FILE } from './src/poc5/background-probe';
 import { PAIRS, PLACES } from './src/poc5/places';
-import { buildRouteRequest, summarizeRouteResponse } from './src/routing/request';
 import { VoiceScreen } from './src/poc6/VoiceScreen';
 import { MapScreen } from './src/poc7/MapScreen';
+import { buildRouteRequest, summarizeRouteResponse } from './src/routing/request';
+import { PlanScreen } from './src/screens/PlanScreen';
+import { RideScreen } from './src/screens/RideScreen';
+import { isTripRunning, resumeTripIfNeeded } from './src/trip/trip-runner';
 
 type Line = { text: string; failed?: boolean };
 
-type Tab = 'map' | 'voice' | 'poc5';
+type Mode = 'loading' | 'plan' | 'ride' | 'development';
 
 export default function App() {
+  const [mode, setMode] = useState<Mode>('loading');
+
+  // 走行中にアプリを開き直したら、走行中の画面に戻す
+  useEffect(() => {
+    isTripRunning().then(async (running) => {
+      if (running) await resumeTripIfNeeded().catch((error) => writeLog('trip-resume-error', { message: String(error) }));
+      setMode(running ? 'ride' : 'plan');
+    });
+  }, []);
+
+  return (
+    <View style={styles.root}>
+      <StatusBar style="dark" />
+      {mode === 'plan' && <PlanScreen onStarted={() => setMode('ride')} onOpenDevelopment={() => setMode('development')} />}
+      {mode === 'ride' && <RideScreen onStopped={() => setMode('plan')} />}
+      {mode === 'development' && <DevelopmentScreen onClose={() => setMode('plan')} />}
+    </View>
+  );
+}
+
+type Tab = 'map' | 'voice' | 'poc5';
+
+/** PoC 5〜7 の画面（設計書 8 章）。確かめ直すときのために残す */
+function DevelopmentScreen({ onClose }: { onClose: () => void }) {
   const [tab, setTab] = useState<Tab>('map');
   return (
     <View style={styles.root}>
       {tab === 'map' ? <MapScreen /> : tab === 'voice' ? <VoiceScreen /> : <Poc5Screen />}
       <View style={styles.tabs}>
+        <TabButton label="戻る" selected={false} onPress={onClose} />
         <TabButton label="地図" selected={tab === 'map'} onPress={() => setTab('map')} />
         <TabButton label="声" selected={tab === 'voice'} onPress={() => setTab('voice')} />
         <TabButton label="計算" selected={tab === 'poc5'} onPress={() => setTab('poc5')} />
