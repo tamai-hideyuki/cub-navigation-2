@@ -29,8 +29,8 @@ export const PAIRS: { from: string; to: string; desktopKilometers: number }[] = 
 /** ロック中のテストで、現在地が関西の外のときに代わりに使う組 */
 export const FALLBACK_PAIR = { from: '大阪駅', to: '京都駅' };
 
-/** 6府県の範囲の箱（tiles/make_area.py の結果） */
-export const AREA_BOX = { west: 134.232, south: 33.216, east: 136.476, north: 36.168 };
+/** 7府県（三重を含む）の範囲の箱（tiles/data/area.bounds、make_area.py の結果） */
+export const AREA_BOX = { west: 134.232, south: 33.215, east: 137.347, north: 36.168 };
 
 export function isInsideArea(point: Coordinate): boolean {
   return (

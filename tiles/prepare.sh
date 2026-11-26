@@ -1,16 +1,16 @@
 #!/bin/bash
-# 関西の pbf を6府県で切り、通れない道を消した route.osm.pbf を作る（設計書 2.2・2.3）
+# 関西の pbf を対象の府県（make_area.py の PREFECTURES）で切り、通れない道を消した route.osm.pbf を作る（設計書 2.2・2.3）
 # 前提: data/kansai-latest.osm.pbf がある。.venv に shapely が入っている
 set -euo pipefail
 cd "$(dirname "$0")"
 PY=.venv/bin/python
 cd data
 
-# 1. 6府県の境界をつなぎ、余白を付けて切る
+# 1. 府県の境界をつなぎ、余白を付けて切る
 osmium tags-filter kansai-latest.osm.pbf r/boundary=administrative -o boundaries.osm.pbf --overwrite
-osmium tags-filter boundaries.osm.pbf r/ISO3166-2=JP-25,JP-26,JP-27,JP-28,JP-29,JP-30 -o pref6.osm.pbf --overwrite
-osmium export pref6.osm.pbf --geometry-types=polygon -a type,id -o pref6.geojson --overwrite
-../$PY ../make_area.py pref6.geojson area.geojson
+osmium tags-filter boundaries.osm.pbf "r/ISO3166-2=$(../$PY ../make_area.py --codes)" -o prefectures.osm.pbf --overwrite
+osmium export prefectures.osm.pbf --geometry-types=polygon -a type,id -o prefectures.geojson --overwrite
+../$PY ../make_area.py prefectures.geojson area.geojson
 osmium extract -p area.geojson --strategy smart kansai-latest.osm.pbf -o area.osm.pbf --overwrite
 
 # 2. 道を出し、消す道を決める（理由ごとの数・決まりに無い値・怪しい道は out/removals.json）

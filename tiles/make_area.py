@@ -1,6 +1,8 @@
-"""6府県の境界をつなぎ、外側に余白を付けた範囲を GeoJSON で書く（設計書 2.2）。
+"""対象の府県の境界をつなぎ、外側に余白を付けた範囲を GeoJSON で書く（設計書 2.2）。
+範囲の箱（西,南,東,北）も area.bounds に書く（build_map.sh とアプリが使う）。
 
-使い方: python make_area.py pref6.geojson area.geojson [余白のメートル]
+使い方: python make_area.py prefectures.geojson area.geojson [余白のメートル]
+  python make_area.py --codes  … 対象の府県のコードを , でつないで出す（prepare.sh が使う）
 """
 
 import json
@@ -10,12 +12,17 @@ import sys
 from shapely.geometry import mapping, shape
 from shapely.ops import transform, unary_union
 
-PREFECTURES = {"JP-25", "JP-26", "JP-27", "JP-28", "JP-29", "JP-30"}
+# 対象の府県（ISO 3166-2）。三重・滋賀・京都・大阪・兵庫・奈良・和歌山
+# 三重県は 2026-11-26 に足した（伊勢へ行くため）
+PREFECTURES = {"JP-24", "JP-25", "JP-26", "JP-27", "JP-28", "JP-29", "JP-30"}
 DEFAULT_MARGIN_METERS = 2000
 METERS_PER_DEGREE_LATITUDE = 111_320
 
 
 def main() -> None:
+    if sys.argv[1] == "--codes":
+        print(",".join(sorted(PREFECTURES)))
+        return
     source, target = sys.argv[1], sys.argv[2]
     margin = float(sys.argv[3]) if len(sys.argv) > 3 else DEFAULT_MARGIN_METERS
 
@@ -39,7 +46,10 @@ def main() -> None:
         {"type": "FeatureCollection", "features": [{"type": "Feature", "properties": {}, "geometry": mapping(padded)}]},
         open(target, "w", encoding="utf-8"),
     )
-    print(f"範囲: 6府県 + 余白 {margin:.0f}m, 外形 {padded.geom_type}, 範囲の箱 {[round(v, 3) for v in padded.bounds]}")
+    bounds = ",".join(f"{v:.3f}" for v in padded.bounds)
+    with open(target.replace(".geojson", ".bounds"), "w") as f:
+        f.write(bounds + "\n")
+    print(f"範囲: {len(PREFECTURES)}府県 + 余白 {margin:.0f}m, 外形 {padded.geom_type}, 範囲の箱 {bounds}")
 
 
 if __name__ == "__main__":
