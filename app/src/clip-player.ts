@@ -8,6 +8,7 @@ import { writeLog } from './log';
 
 let player: AudioPlayer | null = null;
 let audioModeReady = false;
+let currentClipId: string | null = null;
 
 export async function prepareAudio(): Promise<void> {
   if (audioModeReady) return;
@@ -29,12 +30,17 @@ function startPlayback(clipId: string): 'started' | 'skipped' {
     if (player === null) {
       player = createAudioPlayer(asset);
       player.addListener('playbackStatusUpdate', (status) => {
-        if (status.didJustFinish) queue.finished();
+        if (status.didJustFinish) {
+          // つなぎ目の間（鳴り終わり → 次の鳴り始め）を記録から測れるように、鳴り終わりも残す（PoC 6）
+          writeLog('clip-finish', { clipId: currentClipId });
+          queue.finished();
+        }
       });
     } else {
       player.replace(asset);
     }
     player.play();
+    currentClipId = clipId;
     writeLog('clip-play', { clipId: clipId });
     return 'started';
   } catch (error) {

@@ -14,6 +14,21 @@ export function writeLog(event: string, detail: Record<string, unknown> = {}): v
   }
 }
 
+/** 記録の最後の lineCount 行を、書いた順に返す */
+export function readRecentLogLines(lineCount: number): string[] {
+  try {
+    if (!logFile.exists) return [];
+    return logFile
+      .textSync()
+      .trim()
+      .split('\n')
+      .filter((line) => line !== '')
+      .slice(-lineCount);
+  } catch {
+    return [];
+  }
+}
+
 export function readLogTail(lineCount: number): string {
   try {
     return logFile.exists ? newestLines(logFile.textSync(), lineCount) : '';

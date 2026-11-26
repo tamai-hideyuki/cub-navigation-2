@@ -9,20 +9,22 @@ import { readLogTail, writeLog } from './src/log';
 import { ensureTilesOpen, isProbing, startProbe, stopProbe, TILE_EXTRACT_FILE } from './src/poc5/background-probe';
 import { PAIRS, PLACES } from './src/poc5/places';
 import { buildRouteRequest, summarizeRouteResponse } from './src/routing/request';
+import { VoiceScreen } from './src/poc6/VoiceScreen';
 import { MapScreen } from './src/poc7/MapScreen';
 
 type Line = { text: string; failed?: boolean };
 
-type Tab = 'map' | 'poc5';
+type Tab = 'map' | 'voice' | 'poc5';
 
 export default function App() {
   const [tab, setTab] = useState<Tab>('map');
   return (
     <View style={styles.root}>
-      {tab === 'map' ? <MapScreen /> : <Poc5Screen />}
+      {tab === 'map' ? <MapScreen /> : tab === 'voice' ? <VoiceScreen /> : <Poc5Screen />}
       <View style={styles.tabs}>
-        <TabButton label="地図（PoC 7）" selected={tab === 'map'} onPress={() => setTab('map')} />
-        <TabButton label="計算（PoC 5）" selected={tab === 'poc5'} onPress={() => setTab('poc5')} />
+        <TabButton label="地図" selected={tab === 'map'} onPress={() => setTab('map')} />
+        <TabButton label="声" selected={tab === 'voice'} onPress={() => setTab('voice')} />
+        <TabButton label="計算" selected={tab === 'poc5'} onPress={() => setTab('poc5')} />
       </View>
     </View>
   );
