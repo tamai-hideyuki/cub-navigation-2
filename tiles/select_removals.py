@@ -1,6 +1,8 @@
 """消す道を決める（設計書 2.3）。
 
 osmium で出した道の OPL を読み、消す way の ID と、その理由ごとの一覧、怪しい道の一覧を書く。
+時間帯で通れないだけの道（読める書き方の :conditional、または blocklist の timeRule）は消さずに、
+Valhalla が読める規制（time_rules.py）を out/time-rules.json に書く。prepare.sh がそれを道に書き込む。
 
 使い方: python select_removals.py ways.opl blocklist.json allowlist.json out/
   ways.opl: highway か route=ferry を持つ way（osmium cat -f opl）
@@ -11,6 +13,8 @@ import os
 import sys
 from collections import Counter, defaultdict
 from urllib.parse import unquote
+
+from time_rules import load_holidays, parse_clauses, parse_conditional, to_valhalla
 
 # 二輪・原付の通行のタグ
 TWO_WHEEL_KEYS = ("motorcycle", "access:motorcycle", "moped", "access:moped")
@@ -94,6 +98,30 @@ def reasons_for(tags: dict[str, str]) -> list[str]:
 LAYER_ONE = {"motorway", "motorroad", "toll", "ferry"}
 
 
+def time_rule_for(tags: dict[str, str], reasons: list[str], entry, holidays):
+    """時間帯で通れないだけの道なら、Valhalla に渡す規制の文字列を返す。いつも通れないなら None"""
+    if set(reasons) - {"conditional", "blocklist"}:
+        return None  # 他の理由でも通れない
+    if "blocklist" in reasons and not entry.get("timeRule"):
+        return None  # 人が確かめて、いつも通れない
+    clauses = []
+    if "conditional" in reasons:
+        for key in CONDITIONAL_KEYS:
+            value = tags.get(key)
+            if value is None or not any(part.strip().startswith(tuple(BLOCKED_VALUES)) for part in value.split(";")):
+                continue
+            parsed = parse_conditional(value)
+            if parsed is None:
+                return None  # 読めない書き方（winter など）は、いつも通れないことにする
+            clauses += parsed
+    if entry and entry.get("timeRule"):
+        parsed = parse_clauses(entry["timeRule"])
+        if parsed is None:
+            sys.exit(f"blocklist の timeRule が読めない: {entry['name']} {entry['timeRule']}")
+        clauses += parsed
+    return to_valhalla(clauses, holidays) if clauses else None
+
+
 def load_list(path: str) -> dict[int, dict]:
     """blocklist.json・allowlist.json を読み、way の ID → 項目 にする。
 
@@ -116,6 +144,8 @@ def main() -> None:
     os.makedirs(out_dir, exist_ok=True)
     blocklist = load_list(blocklist_path)
     allowlist = load_list(allowlist_path)
+    holidays = load_holidays()
+    timed: dict[int, str] = {}
 
     removed: dict[int, list[str]] = {}
     unknown_values: list[dict] = []
@@ -137,6 +167,12 @@ def main() -> None:
             if way_id in allowlist and not (set(reasons) & LAYER_ONE) and "blocklist" not in reasons:
                 reasons = []
             highway = tags.get("highway", "")
+            rule = time_rule_for(tags, reasons, blocklist.get(way_id), holidays) if reasons else None
+            if rule:
+                timed[way_id] = rule  # 消さずに、時間帯の規制を書き込む
+                if highway in LINK_ROADS:
+                    node_to_link.update(nodes)
+                continue
             if reasons:
                 removed[way_id] = reasons
                 if tags.get("name"):
@@ -172,9 +208,14 @@ def main() -> None:
     with open(os.path.join(out_dir, "removed-ids.txt"), "w") as f:
         for way_id in sorted(removed):
             f.write(f"w{way_id}\n")
+    with open(os.path.join(out_dir, "timed-ids.txt"), "w") as f:
+        for way_id in sorted(timed):
+            f.write(f"w{way_id}\n")
+    json.dump({str(k): v for k, v in sorted(timed.items())}, open(os.path.join(out_dir, "time-rules.json"), "w"), indent=1)
     counts = Counter(r for rs in removed.values() for r in rs)
     report = {
         "removedWays": len(removed),
+        "timedWays": len(timed),
         "byReason": dict(sorted(counts.items())),
         "unknownValues": unknown_values,
         "suspiciousWays": sorted(suspicious, key=lambda s: (s["name"] or "", s["id"])),
@@ -183,6 +224,7 @@ def main() -> None:
     json.dump(report, open(os.path.join(out_dir, "removals.json"), "w", encoding="utf-8"), ensure_ascii=False, indent=2)
 
     print(f"消す way: {len(removed)}")
+    print(f"時間帯の規制を書き込む way: {len(timed)}")
     for reason, n in sorted(counts.items()):
         print(f"  {reason}: {n}")
     print(f"決まりに無い値: {len(unknown_values)}")

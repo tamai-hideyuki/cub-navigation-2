@@ -594,7 +594,8 @@
         "https://www.jmpsa.or.jp/society/roadinfo/area-120-137.html"
       ],
       "checkedAt": "2026-11-26",
-      "jmpsaNo": 26
+      "jmpsaNo": 26,
+      "timeRule": "Sa,Su,PH 10:00-22:00"
     },
     {
       "name": "茨木市",
@@ -615,7 +616,8 @@
         "https://www.jmpsa.or.jp/society/roadinfo/area-120-137.html"
       ],
       "checkedAt": "2026-11-26",
-      "jmpsaNo": 27
+      "jmpsaNo": 27,
+      "timeRule": "Sa,Su,PH 13:00-17:00"
     },
     {
       "name": "箕面市",
@@ -717,7 +719,8 @@
         "https://www.jmpsa.or.jp/society/roadinfo/area-120-137.html"
       ],
       "checkedAt": "2026-11-26",
-      "jmpsaNo": 33
+      "jmpsaNo": 33,
+      "timeRule": "Sa,PH -1 day 21:00-24:00; Su,PH 00:00-05:00"
     },
     {
       "name": "八尾市",
@@ -832,7 +835,8 @@
         "https://www.jmpsa.or.jp/society/roadinfo/area-120-137.html"
       ],
       "checkedAt": "2026-11-26",
-      "jmpsaNo": 45
+      "jmpsaNo": 45,
+      "timeRule": "Sa,PH -1 day 23:00-24:00; Su,PH 00:00-07:00"
     },
     {
       "name": "大東市",
@@ -849,7 +853,8 @@
         "https://www.jmpsa.or.jp/society/roadinfo/area-120-137.html"
       ],
       "checkedAt": "2026-11-26",
-      "jmpsaNo": 46
+      "jmpsaNo": 46,
+      "timeRule": "Sa,PH -1 day 23:00-24:00; Su,PH 00:00-07:00"
     },
     {
       "name": "島本町",
@@ -891,7 +896,8 @@
         "https://www.jmpsa.or.jp/society/roadinfo/area-120-137.html"
       ],
       "checkedAt": "2026-11-26",
-      "jmpsaNo": 51
+      "jmpsaNo": 51,
+      "timeRule": "Sa,Su,PH"
     },
     {
       "name": "豊能町",
@@ -1053,7 +1059,8 @@
         "https://www.jmpsa.or.jp/society/roadinfo/area-120-138.html"
       ],
       "checkedAt": "2026-11-26",
-      "jmpsaNo": 66
+      "jmpsaNo": 66,
+      "timeRule": "Sa,Su,PH"
     },
     {
       "name": "神戸市道（裏六甲ドライブウェイ）",
@@ -1070,7 +1077,8 @@
         "https://www.jmpsa.or.jp/society/roadinfo/area-120-138.html"
       ],
       "checkedAt": "2026-11-26",
-      "jmpsaNo": 67
+      "jmpsaNo": 67,
+      "timeRule": "Sa,Su,PH"
     },
     {
       "name": "神戸市道神戸箕谷線（再度山ドライブウェイ）",
@@ -1145,7 +1153,8 @@
         "https://www.jmpsa.or.jp/society/roadinfo/area-120-138.html"
       ],
       "checkedAt": "2026-11-26",
-      "jmpsaNo": 71
+      "jmpsaNo": 71,
+      "timeRule": "Sa,Su,PH"
     },
     {
       "name": "神戸市道神戸箕谷線（再度山ドライブウェイ）",
@@ -1192,7 +1201,8 @@
         "https://www.jmpsa.or.jp/society/roadinfo/area-120-138.html"
       ],
       "checkedAt": "2026-11-26",
-      "jmpsaNo": 73
+      "jmpsaNo": 73,
+      "timeRule": "Sa,Su,PH"
     },
     {
       "name": "芦屋市道",
@@ -1211,7 +1221,8 @@
         "https://www.jmpsa.or.jp/society/roadinfo/area-120-138.html"
       ],
       "checkedAt": "2026-11-26",
-      "jmpsaNo": 74
+      "jmpsaNo": 74,
+      "timeRule": "Sa,Su,PH"
     },
     {
       "name": "芦屋市道",
@@ -1237,7 +1248,8 @@
         "https://www.jmpsa.or.jp/society/roadinfo/area-120-138.html"
       ],
       "checkedAt": "2026-11-26",
-      "jmpsaNo": 75
+      "jmpsaNo": 75,
+      "timeRule": "Sa,Su,PH"
     },
     {
       "name": "西宮市道",
@@ -1279,7 +1291,8 @@
         "https://www.jmpsa.or.jp/society/roadinfo/area-120-138.html"
       ],
       "checkedAt": "2026-11-26",
-      "jmpsaNo": 77
+      "jmpsaNo": 77,
+      "timeRule": "Sa,Su,PH"
     },
     {
       "name": "たつの市道",
@@ -1296,7 +1309,8 @@
         "https://www.jmpsa.or.jp/society/roadinfo/area-120-138.html"
       ],
       "checkedAt": "2026-11-26",
-      "jmpsaNo": 80
+      "jmpsaNo": 80,
+      "timeRule": "Sa,Su,PH"
     },
     {
       "name": "県道坂越御崎加里屋線",
@@ -1313,7 +1327,8 @@
         "https://www.jmpsa.or.jp/society/roadinfo/area-120-138.html"
       ],
       "checkedAt": "2026-11-26",
-      "jmpsaNo": 83
+      "jmpsaNo": 83,
+      "timeRule": "Sa,Su,PH"
     },
     {
       "name": "県道月瀬針線",
@@ -1378,7 +1393,8 @@
         "https://www.jmpsa.or.jp/society/roadinfo/area-120-139.html"
       ],
       "checkedAt": "2026-11-26",
-      "jmpsaNo": 91
+      "jmpsaNo": 91,
+      "timeRule": "Su,PH"
     },
     {
       "name": "市道",
@@ -1397,7 +1413,8 @@
         "https://www.jmpsa.or.jp/society/roadinfo/area-120-145.html"
       ],
       "checkedAt": "2026-11-26",
-      "jmpsaNo": 92
+      "jmpsaNo": 92,
+      "timeRule": "Mo-Fr 07:30-08:30"
     },
     {
       "name": "再度山ドライブウェイ",

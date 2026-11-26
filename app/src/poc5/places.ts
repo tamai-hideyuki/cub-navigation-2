@@ -16,13 +16,13 @@ export const PLACES: Record<string, Coordinate> = {
   甲西駅: { longitude: 136.058, latitude: 35.014 },
 };
 
-/** パソコン（Docker の Valhalla）で出た距離（km）。端末の答えと合うかを見る */
+/** パソコン（Docker の Valhalla、motorcycle・平日 12:00 に出発）で出た距離（km）。端末の答えと合うかを見る */
 export const PAIRS: { from: string; to: string; desktopKilometers: number }[] = [
   { from: '大阪駅', to: '京都駅', desktopKilometers: 47.1 },
   { from: '三宮', to: '奈良駅', desktopKilometers: 72.2 },
-  { from: '姫路駅', to: '和歌山駅', desktopKilometers: 166.3 },
-  { from: '舞鶴', to: '新宮', desktopKilometers: 304.2 },
-  { from: '豊岡', to: '彦根', desktopKilometers: 261.0 },
+  { from: '姫路駅', to: '和歌山駅', desktopKilometers: 166.5 },
+  { from: '舞鶴', to: '新宮', desktopKilometers: 298.4 },
+  { from: '豊岡', to: '彦根', desktopKilometers: 245.5 },
   { from: '草津駅', to: '甲西駅', desktopKilometers: 10.9 },
 ];
 

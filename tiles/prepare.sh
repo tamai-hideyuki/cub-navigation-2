@@ -18,14 +18,24 @@ osmium tags-filter area.osm.pbf w/highway w/route=ferry -o ways.osm.pbf --overwr
 osmium cat ways.osm.pbf -t way -f opl -o ways.opl --overwrite
 ../$PY ../select_removals.py ways.opl ../blocklist.json ../allowlist.json out
 
-# 3. 消す
-osmium removeid -i out/removed-ids.txt area.osm.pbf -o route.osm.pbf --overwrite
+# 3. 消す。時間帯で通れないだけの道は消さずに、規制を書き込む（out/time-rules.json）
+osmium removeid -i out/removed-ids.txt area.osm.pbf -o kept.osm.pbf --overwrite
+osmium getid kept.osm.pbf -i out/timed-ids.txt -o timed.osm.pbf --overwrite
+../$PY ../apply_time_rules.py timed.osm.pbf out/time-rules.json timed-rewritten.osm.pbf
+osmium removeid -i out/timed-ids.txt kept.osm.pbf -o kept-untimed.osm.pbf --overwrite
+osmium merge kept-untimed.osm.pbf timed-rewritten.osm.pbf -o route.osm.pbf --overwrite
 
 # 4. 確かめ: 1段目のタグを持つ道が残っていない
 osmium tags-filter route.osm.pbf w/highway=motorway,motorway_link w/toll=yes w/motorroad=yes w/route=ferry -o left.osm.pbf --overwrite
 left=$(osmium cat -t way -f opl left.osm.pbf | wc -l | tr -d ' ')
 if [ "$left" != "0" ]; then
   echo "消すはずの道が ${left} 本残っている" >&2
+  exit 1
+fi
+# 5. 確かめ: 規制を書き込んだ道が、全部残っている
+timed=$(osmium tags-filter route.osm.pbf "w/motorcycle:conditional" -o - -f opl | grep -c '^w' || true)
+if [ "$timed" -lt "$(wc -l < out/timed-ids.txt | tr -d ' ')" ]; then
+  echo "時間帯の規制を書き込んだ道が足りない（${timed} 本）" >&2
   exit 1
 fi
 ls -lh route.osm.pbf

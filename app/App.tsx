@@ -41,6 +41,9 @@ export default function App() {
 
 type Tab = 'map' | 'voice' | 'poc5';
 
+/** 速さを測るときの出発の時刻。パソコンの距離（places.ts）と同じ時刻にする */
+const BENCHMARK_DEPARTURE = new Date('2026-11-30T12:00:00+09:00');
+
 /** PoC 5〜7 の画面（設計書 8 章）。確かめ直すときのために残す */
 function DevelopmentScreen({ onClose }: { onClose: () => void }) {
   const [tab, setTab] = useState<Tab>('map');
@@ -104,7 +107,7 @@ function Poc5Screen() {
       // 1回目はタイルを読み込むので遅い。同じ組を2回計算して、2回目の速さも見る
       for (const round of [1, 2]) {
         for (const pair of PAIRS) {
-          const request = buildRouteRequest(PLACES[pair.from], PLACES[pair.to]);
+          const request = buildRouteRequest(PLACES[pair.from], PLACES[pair.to], { departAt: BENCHMARK_DEPARTURE });
           try {
             const result = await route(request);
             const summary = summarizeRouteResponse(result.response);
@@ -121,6 +124,34 @@ function Poc5Screen() {
         }
       }
       add(`終わった後のメモリ ${Math.round(memoryFootprintMegabytes())}MB`);
+    } catch (error) {
+      add(`失敗: ${String(error)}`, true);
+    } finally {
+      setBusy(false);
+      refresh();
+    }
+  }, [add, refresh]);
+
+  // 時間帯の規制（設計書 2.3）: 阪奈道路は「日曜・祝日の 0〜6 時」に二輪が通れない。
+  // 平日の昼は阪奈道路を通り（約 13.4km）、日曜 3 時は避ける（約 15.0km）ことを、端末の中の計算で確かめる
+  const runTimeCheck = useCallback(async () => {
+    setBusy(true);
+    setLines([]);
+    try {
+      await ensureTilesOpen();
+      const from = { longitude: 135.626, latitude: 34.695 }; // 住道駅
+      const to = { longitude: 135.7, latitude: 34.693 }; // 生駒駅
+      for (const [label, departAt] of [
+        ['平日 12:00', '2026-11-30T12:00:00+09:00'],
+        ['日曜 3:00', '2026-11-29T03:00:00+09:00'],
+        ['祝日 3:00', '2026-11-23T03:00:00+09:00'],
+      ] as const) {
+        const result = await route(buildRouteRequest(from, to, { departAt: new Date(departAt) }));
+        const summary = summarizeRouteResponse(result.response);
+        add(`住道駅→生駒駅 ${label} ${summary.kilometers}km ${summary.minutes}分`);
+        writeLog('time-rule-check', { label, ...summary });
+      }
+      add('平日は約 13.4km（阪奈道路を通る）、日曜・祝日の 3 時は約 15.0km（避ける）なら正しい');
     } catch (error) {
       add(`失敗: ${String(error)}`, true);
     } finally {
@@ -146,6 +177,7 @@ function Poc5Screen() {
       <Text style={styles.status}>{tileStatus}</Text>
       <View style={styles.buttons}>
         <Button label={busy ? '計算中…' : '速さを測る'} onPress={runBenchmark} disabled={busy} />
+        <Button label="時間帯の規制を試す" onPress={runTimeCheck} disabled={busy} />
         <Button label={probing ? 'ロック中のテストを止める' : 'ロック中のテストを始める'} onPress={toggleProbe} />
         <Button label="記録を更新" onPress={refresh} />
       </View>
