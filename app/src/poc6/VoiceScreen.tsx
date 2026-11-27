@@ -16,7 +16,12 @@ const SAMPLES: { distance: GuidanceDistance; direction: TurnDirection; label: st
   { distance: 'far', direction: 'keep_left', label: '300m先・左側' },
 ];
 
-const COMMON_SAMPLES = [COMMON_CLIPS.start, 'common-rerouted', COMMON_CLIPS.offRoute, 'common-unreachable'];
+const COMMON_SAMPLES = [
+  COMMON_CLIPS.start,
+  'common-rerouted',
+  COMMON_CLIPS.offRoute,
+  'common-unreachable',
+];
 
 export function VoiceScreen() {
   const [gapText, setGapText] = useState('');
@@ -37,7 +42,9 @@ export function VoiceScreen() {
     const sorted = gaps.map((gap) => gap.gapMilliseconds).sort((a, b) => a - b);
     setGapText(
       `つなぎ目 ${gaps.length} 回・真ん中 ${sorted[Math.floor(sorted.length / 2)]}ms・最大 ${sorted.at(-1)}ms\n` +
-        recent.map((gap) => `${gap.fromClipId} → ${gap.toClipId}: ${gap.gapMilliseconds}ms`).join('\n'),
+        recent
+          .map((gap) => `${gap.fromClipId} → ${gap.toClipId}: ${gap.gapMilliseconds}ms`)
+          .join('\n'),
     );
   }, []);
 
@@ -68,14 +75,24 @@ export function VoiceScreen() {
       {SAMPLES.map((sample) => (
         <View key={sample.label} style={styles.row}>
           <Text style={styles.rowLabel}>{sample.label}</Text>
-          <Button label="部品をつなぐ" onPress={() => play(sample.distance, sample.direction, 'parts')} />
-          <Button label="つないで作った" onPress={() => play(sample.distance, sample.direction, 'joined')} />
+          <Button
+            label="部品をつなぐ"
+            onPress={() => play(sample.distance, sample.direction, 'parts')}
+          />
+          <Button
+            label="つないで作った"
+            onPress={() => play(sample.distance, sample.direction, 'joined')}
+          />
         </View>
       ))}
       <Text style={styles.section}>共通の声</Text>
       <View style={styles.wrap}>
         {COMMON_SAMPLES.map((clipId) => (
-          <Button key={clipId} label={clipId.replace('common-', '')} onPress={() => enqueueClips([clipId])} />
+          <Button
+            key={clipId}
+            label={clipId.replace('common-', '')}
+            onPress={() => enqueueClips([clipId])}
+          />
         ))}
       </View>
       <Text style={styles.section}>画面ロック中</Text>
@@ -93,7 +110,11 @@ export function VoiceScreen() {
 
 function Button({ label, onPress }: { label: string; onPress: () => void }) {
   return (
-    <Pressable accessibilityRole="button" onPress={onPress} style={({ pressed }) => [styles.button, pressed && styles.pressed]}>
+    <Pressable
+      accessibilityRole="button"
+      onPress={onPress}
+      style={({ pressed }) => [styles.button, pressed && styles.pressed]}
+    >
       <Text style={styles.buttonText}>{label}</Text>
     </Pressable>
   );
@@ -108,7 +129,13 @@ const styles = StyleSheet.create({
   rowLabel: { width: 112, fontSize: 14 },
   wrap: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   section: { fontSize: 15, fontWeight: '600', marginTop: 12 },
-  button: { backgroundColor: '#185FA5', borderRadius: 8, paddingVertical: 10, paddingHorizontal: 12, alignItems: 'center' },
+  button: {
+    backgroundColor: '#185FA5',
+    borderRadius: 8,
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    alignItems: 'center',
+  },
   pressed: { opacity: 0.6 },
   buttonText: { color: '#ffffff', fontSize: 14, fontWeight: '600' },
   error: { color: '#A32D2D', fontSize: 13 },

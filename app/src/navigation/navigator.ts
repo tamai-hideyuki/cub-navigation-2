@@ -38,7 +38,11 @@ export function findNearestOnRoute(
   const lastSegment = route.geometry.length - 2;
   for (let segment = firstSegment; segment <= lastSegment; segment++) {
     if (route.cumulativeMeters[segment] > limitMeters) break;
-    const result = nearestPointOnSegment(point, route.geometry[segment], route.geometry[segment + 1]);
+    const result = nearestPointOnSegment(
+      point,
+      route.geometry[segment],
+      route.geometry[segment + 1],
+    );
     if (nearest === null || result.distanceMeters < nearest.distanceMeters) {
       const segmentLength = route.cumulativeMeters[segment + 1] - route.cumulativeMeters[segment];
       nearest = {
@@ -78,7 +82,8 @@ export function updateProgress(
   search: ProgressSearch,
   configuration: NavigationConfiguration,
 ): { progress: ProgressState; distanceToRouteMeters: number | null } {
-  const isOnRoute = (nearest: NearestOnRoute) => nearest.distanceMeters <= configuration.offRouteMeters;
+  const isOnRoute = (nearest: NearestOnRoute) =>
+    nearest.distanceMeters <= configuration.offRouteMeters;
 
   if (!progress.acquired) {
     const nearest = findNearestOnRoute(route, point, 0, Infinity);
@@ -188,7 +193,10 @@ export function step(
   const emptyDebug = { distanceToRouteMeters: null, nextManeuverId: null, remainingMeters: null };
 
   // 精度の悪い位置は使わない（トンネル・ビルの谷間）
-  if (reading.accuracyMeters !== null && reading.accuracyMeters > configuration.maximumAccuracyMeters) {
+  if (
+    reading.accuracyMeters !== null &&
+    reading.accuracyMeters > configuration.maximumAccuracyMeters
+  ) {
     return { state: state, clipIds: [], debug: emptyDebug };
   }
 
@@ -196,7 +204,8 @@ export function step(
   const wasAcquired = state.progress.acquired;
   const afterLongGap =
     state.lastReadingMilliseconds !== null &&
-    reading.timestampMilliseconds - state.lastReadingMilliseconds >= configuration.readingGapMilliseconds;
+    reading.timestampMilliseconds - state.lastReadingMilliseconds >=
+      configuration.readingGapMilliseconds;
   const progressResult = updateProgress(
     route,
     state.progress,
@@ -227,9 +236,17 @@ export function step(
     clipIds.push(...offRouteResult.clipIds);
   }
 
-  let debug: NavigationOutput['debug'] = { ...emptyDebug, distanceToRouteMeters: distanceToRouteMeters };
+  let debug: NavigationOutput['debug'] = {
+    ...emptyDebug,
+    distanceToRouteMeters: distanceToRouteMeters,
+  };
   if (progressResult.progress.acquired && offRoute.status !== 'off') {
-    const announcement = updateAnnouncements(route, progressResult.progress, playedClipIds, configuration);
+    const announcement = updateAnnouncements(
+      route,
+      progressResult.progress,
+      playedClipIds,
+      configuration,
+    );
     clipIds.push(...announcement.clipIds);
     debug = {
       ...debug,
@@ -240,7 +257,8 @@ export function step(
 
   // 繰り返す警告（offroute・onroute）は記録しない。曲がる案内・開始は一度だけ
   for (const clipId of clipIds) {
-    if (clipId !== COMMON_CLIPS.offRoute && clipId !== COMMON_CLIPS.onRoute) playedClipIds.add(clipId);
+    if (clipId !== COMMON_CLIPS.offRoute && clipId !== COMMON_CLIPS.onRoute)
+      playedClipIds.add(clipId);
   }
 
   return {

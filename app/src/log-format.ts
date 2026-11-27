@@ -1,7 +1,11 @@
 // 走行の記録の書式（純粋な関数）。ファイルへの書き込みは log.ts
 
 /** 1件を1行の JSON にする */
-export function formatLogLine(time: Date, event: string, detail: Record<string, unknown> = {}): string {
+export function formatLogLine(
+  time: Date,
+  event: string,
+  detail: Record<string, unknown> = {},
+): string {
   return JSON.stringify({ time: time.toISOString(), event: event, ...detail }) + '\n';
 }
 

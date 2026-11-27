@@ -18,7 +18,10 @@ export type RerouteHistory = {
   lastAttemptFailed: boolean;
 };
 
-export const EMPTY_REROUTE_HISTORY: RerouteHistory = { lastAttemptMilliseconds: null, lastAttemptFailed: false };
+export const EMPTY_REROUTE_HISTORY: RerouteHistory = {
+  lastAttemptMilliseconds: null,
+  lastAttemptFailed: false,
+};
 
 /** 外れが確かになって（navigator の offRoute が 'off'）、前の計算から間が空いていればリルートする。着いた後はしない */
 export function shouldReroute(

@@ -11,7 +11,13 @@ test('文字をそろえる（build_search.py と同じ）: 全角・半角・�
   assert.equal(normalizeSearchText('オカゲ横丁'), 'おかげ横丁');
 });
 
-function place(id: number, name: string, priority: number, longitude: number, latitude: number): Place {
+function place(
+  id: number,
+  name: string,
+  priority: number,
+  longitude: number,
+  latitude: number,
+): Place {
   return {
     id,
     name,
@@ -44,14 +50,26 @@ test('名前がぴったり合うものを先に、同じ段では近いもの�
 });
 
 test('結果の2行目: 種類・市区町村・距離', () => {
-  const [ranked] = rankPlaces([place(1, 'おかげ横丁', 75, 136.7253, 34.4625)], 'おかげ', { longitude: 136.7253, latitude: 34.47 }, 1);
+  const [ranked] = rankPlaces(
+    [place(1, 'おかげ横丁', 75, 136.7253, 34.4625)],
+    'おかげ',
+    { longitude: 136.7253, latitude: 34.47 },
+    1,
+  );
   assert.equal(placeSubtitle(ranked), '観光 · 伊勢市 · 830m');
 });
 
 test('読み（英語の名前など）の先頭が合うものも先に出す。遠くの有名な場所が、近くの小さなお店に負けない', () => {
   const osaka = { longitude: 135.4959, latitude: 34.7025 };
-  const okageYokocho = { ...place(1, 'おかげ横丁', 75, 136.7253, 34.4625), readings: 'Okage Yokocho Ancien', searchText: 'おかげ横丁okageyokochoancien' };
+  const okageYokocho = {
+    ...place(1, 'おかげ横丁', 75, 136.7253, 34.4625),
+    readings: 'Okage Yokocho Ancien',
+    searchText: 'おかげ横丁okageyokochoancien',
+  };
   const smallShop = { ...place(2, 'OKAGEN', 20, 135.52, 34.62), category: '建物' };
   const ranked = rankPlaces([smallShop, okageYokocho], 'okage', osaka, 10);
-  assert.deepEqual(ranked.map((p) => p.id), [1, 2]);
+  assert.deepEqual(
+    ranked.map((p) => p.id),
+    [1, 2],
+  );
 });

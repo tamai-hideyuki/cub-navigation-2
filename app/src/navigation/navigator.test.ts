@@ -174,7 +174,12 @@ test('updateProgress: 最初の位置合わせは 50m 以内のときだけ', ()
   assert.equal(near.progress.acquired, true);
 });
 
-const onRoute: OffRouteState = { status: 'on', awayCount: 0, backCount: 0, lastWarningMilliseconds: null };
+const onRoute: OffRouteState = {
+  status: 'on',
+  awayCount: 0,
+  backCount: 0,
+  lastWarningMilliseconds: null,
+};
 
 test('updateOffRoute: 30m〜50m の間は数えない（ばたつきを防ぐ）', () => {
   const result = updateOffRoute({ ...onRoute, awayCount: 2 }, 40, 0, DEFAULT_CONFIGURATION);
@@ -270,7 +275,13 @@ test('着いた後は、ルートから離れても外れの警告を出さな�
 test('updateProgress: 長い途切れの後は、2km より先でもルートに合わせる', () => {
   const progress = { segmentIndex: 10, distanceAlongMeters: 1000, acquired: true };
   const point = offsetFromOrigin(8000, 5);
-  const ordinary = updateProgress(longRoute, progress, point, ordinarySearch, DEFAULT_CONFIGURATION);
+  const ordinary = updateProgress(
+    longRoute,
+    progress,
+    point,
+    ordinarySearch,
+    DEFAULT_CONFIGURATION,
+  );
   assert.equal(ordinary.progress.distanceAlongMeters, 1000);
   const afterGap = updateProgress(
     longRoute,

@@ -31,11 +31,13 @@ test('toLocationReading: 負の速さ（取れない）は null にする', () =
     timestampMilliseconds: 1234,
   });
   assert.equal(
-    toLocationReading({ ...location, coords: { ...location.coords, speed: 0 } }).speedMetersPerSecond,
+    toLocationReading({ ...location, coords: { ...location.coords, speed: 0 } })
+      .speedMetersPerSecond,
     0,
   );
   assert.equal(
-    toLocationReading({ ...location, coords: { ...location.coords, accuracy: null } }).accuracyMeters,
+    toLocationReading({ ...location, coords: { ...location.coords, accuracy: null } })
+      .accuracyMeters,
     null,
   );
 });
@@ -55,7 +57,10 @@ test('roundedOrNull', () => {
 
 test('formatLogLine と newestLines', () => {
   const line = formatLogLine(new Date('2026-11-23T00:00:00Z'), 'start', { distanceAlongMeters: 0 });
-  assert.equal(line, '{"time":"2026-11-23T00:00:00.000Z","event":"start","distanceAlongMeters":0}\n');
+  assert.equal(
+    line,
+    '{"time":"2026-11-23T00:00:00.000Z","event":"start","distanceAlongMeters":0}\n',
+  );
   assert.equal(newestLines('a\nb\nc\n', 2), 'c\nb');
   assert.equal(newestLines('', 5), '');
 });
@@ -119,7 +124,10 @@ function recordingQueue(skipClipIds: string[] = []) {
       return 'started';
     },
     clock.timer,
-    { ...DEFAULT_CLIP_QUEUE_OPTIONS, onDropped: (clipId, reason) => dropped.push(`${clipId}:${reason}`) },
+    {
+      ...DEFAULT_CLIP_QUEUE_OPTIONS,
+      onDropped: (clipId, reason) => dropped.push(`${clipId}:${reason}`),
+    },
   );
   return { queue: queue, started: started, dropped: dropped, clock: clock };
 }

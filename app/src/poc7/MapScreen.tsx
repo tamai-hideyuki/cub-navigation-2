@@ -1,6 +1,13 @@
 // PoC 7: 端末の中の地図のタイルを、通信なしで描けるか（設計書 5.4・8 章）。
 // 地図・現在地・ルートの線を出す。アプリの本当の走行中の画面（設計書 5.1）は、PoC が終わってから作る
-import { Camera, GeoJSONSource, Layer, Map, type MapProps, UserLocation } from '@maplibre/maplibre-react-native';
+import {
+  Camera,
+  GeoJSONSource,
+  Layer,
+  Map,
+  type MapProps,
+  UserLocation,
+} from '@maplibre/maplibre-react-native';
 import { Directory, File, Paths } from 'expo-file-system';
 import * as Location from 'expo-location';
 import { useCallback, useMemo, useState } from 'react';
@@ -39,11 +46,17 @@ export function MapScreen() {
       const position = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.High });
       const here = { longitude: position.coords.longitude, latitude: position.coords.latitude };
       const origin = isInsideArea(here) ? here : PLACES['大阪駅'];
-      const result = await route(buildRouteRequest(origin, PLACES['京都駅'], { headingDegrees: position.coords.heading }));
+      const result = await route(
+        buildRouteRequest(origin, PLACES['京都駅'], { headingDegrees: position.coords.heading }),
+      );
       const trip = (result.response as { trip: { legs: { shape: string }[] } }).trip;
       const coordinates = trip.legs.flatMap((leg) => decodePolyline6(leg.shape));
       const summary = summarizeRouteResponse(result.response);
-      setRouteLine({ type: 'Feature', properties: {}, geometry: { type: 'LineString', coordinates } });
+      setRouteLine({
+        type: 'Feature',
+        properties: {},
+        geometry: { type: 'LineString', coordinates },
+      });
       setMessage(
         `${isInsideArea(here) ? '現在地' : '大阪駅'}→京都駅 ${summary.kilometers}km ${summary.minutes}分` +
           `・計算 ${Math.round(result.milliseconds)}ms・メモリ ${Math.round(memoryFootprintMegabytes())}MB`,
@@ -64,7 +77,10 @@ export function MapScreen() {
   return (
     <View style={styles.screen}>
       <Map style={styles.map} mapStyle={mapStyle} logo={false} attribution compass={false}>
-        <Camera trackUserLocation="course" initialViewState={{ center: [135.4959, 34.7025], zoom: 15 }} />
+        <Camera
+          trackUserLocation="course"
+          initialViewState={{ center: [135.4959, 34.7025], zoom: 15 }}
+        />
         <UserLocation />
         {routeLine && (
           <GeoJSONSource id="route" data={routeLine}>
@@ -98,7 +114,12 @@ const styles = StyleSheet.create({
   map: { flex: 1 },
   missing: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 16 },
   panel: { position: 'absolute', left: 16, right: 16, bottom: 32, gap: 8 },
-  button: { backgroundColor: '#185FA5', borderRadius: 8, paddingVertical: 12, alignItems: 'center' },
+  button: {
+    backgroundColor: '#185FA5',
+    borderRadius: 8,
+    paddingVertical: 12,
+    alignItems: 'center',
+  },
   buttonText: { color: '#ffffff', fontSize: 16, fontWeight: '600' },
   message: { backgroundColor: '#ffffffee', padding: 8, borderRadius: 8, fontSize: 13 },
 });

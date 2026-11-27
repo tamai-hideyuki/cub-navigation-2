@@ -10,7 +10,13 @@ import { placeSubtitle, type RankedPlace } from '../search/ranking';
 /** 打つのを止めてから探し始めるまで */
 const DEBOUNCE_MILLISECONDS = 250;
 
-export function SearchBar({ onSelect, onOpenDevelopment }: { onSelect: (place: RankedPlace) => void; onOpenDevelopment: () => void }) {
+export function SearchBar({
+  onSelect,
+  onOpenDevelopment,
+}: {
+  onSelect: (place: RankedPlace) => void;
+  onOpenDevelopment: () => void;
+}) {
   const [text, setText] = useState('');
   const [results, setResults] = useState<RankedPlace[]>([]);
   const [message, setMessage] = useState('');
@@ -22,7 +28,11 @@ export function SearchBar({ onSelect, onOpenDevelopment }: { onSelect: (place: R
   useEffect(() => {
     Location.getLastKnownPositionAsync()
       .then((position) => {
-        if (position) hereRef.current = { longitude: position.coords.longitude, latitude: position.coords.latitude };
+        if (position)
+          hereRef.current = {
+            longitude: position.coords.longitude,
+            latitude: position.coords.latitude,
+          };
       })
       .catch(() => {});
   }, []);
@@ -45,7 +55,9 @@ export function SearchBar({ onSelect, onOpenDevelopment }: { onSelect: (place: R
         const found = await searchPlaces(query, hereRef.current);
         if (request !== requestRef.current) return; // もっと新しい入力がある
         setResults(found);
-        setMessage(found.length === 0 ? '見つかりません。地図を長押しして決めることもできます' : '');
+        setMessage(
+          found.length === 0 ? '見つかりません。地図を長押しして決めることもできます' : '',
+        );
       } catch (error) {
         setMessage(`探せませんでした: ${String(error)}`);
       }
@@ -79,7 +91,11 @@ export function SearchBar({ onSelect, onOpenDevelopment }: { onSelect: (place: R
           clearButtonMode="while-editing"
           autoCorrect={false}
         />
-        <Pressable accessibilityRole="button" onPress={onOpenDevelopment} style={styles.developmentButton}>
+        <Pressable
+          accessibilityRole="button"
+          onPress={onOpenDevelopment}
+          style={styles.developmentButton}
+        >
           <Text style={styles.developmentText}>開発用</Text>
         </Pressable>
       </View>
@@ -103,7 +119,9 @@ export function SearchBar({ onSelect, onOpenDevelopment }: { onSelect: (place: R
           ))}
         </ScrollView>
       )}
-      {!focused && text === '' && <Text style={styles.hint}>地図を長押しして決めることもできます</Text>}
+      {!focused && text === '' && (
+        <Text style={styles.hint}>地図を長押しして決めることもできます</Text>
+      )}
     </View>
   );
 }
@@ -122,13 +140,38 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#D3D1C7',
   },
-  developmentButton: { backgroundColor: '#ffffffdd', borderRadius: 12, paddingHorizontal: 12, justifyContent: 'center' },
+  developmentButton: {
+    backgroundColor: '#ffffffdd',
+    borderRadius: 12,
+    paddingHorizontal: 12,
+    justifyContent: 'center',
+  },
   developmentText: { fontSize: 13, color: '#185FA5', fontWeight: '600' },
-  results: { maxHeight: 360, backgroundColor: '#ffffff', borderRadius: 12, borderWidth: 1, borderColor: '#D3D1C7' },
-  result: { paddingVertical: 10, paddingHorizontal: 14, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: '#D3D1C7' },
+  results: {
+    maxHeight: 360,
+    backgroundColor: '#ffffff',
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#D3D1C7',
+  },
+  result: {
+    paddingVertical: 10,
+    paddingHorizontal: 14,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: '#D3D1C7',
+  },
   pressed: { backgroundColor: '#E6F1FB' },
   resultName: { fontSize: 16, fontWeight: '600', color: '#2C2C2A' },
   resultSub: { fontSize: 13, color: '#5F5E5A', marginTop: 2 },
   message: { padding: 12, fontSize: 14, color: '#5F5E5A' },
-  hint: { alignSelf: 'flex-start', fontSize: 13, color: '#2C2C2A', backgroundColor: '#ffffffcc', borderRadius: 8, paddingVertical: 4, paddingHorizontal: 8, overflow: 'hidden' },
+  hint: {
+    alignSelf: 'flex-start',
+    fontSize: 13,
+    color: '#2C2C2A',
+    backgroundColor: '#ffffffcc',
+    borderRadius: 8,
+    paddingVertical: 4,
+    paddingHorizontal: 8,
+    overflow: 'hidden',
+  },
 });

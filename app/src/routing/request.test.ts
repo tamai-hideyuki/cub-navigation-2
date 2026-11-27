@@ -34,14 +34,27 @@ test('向きがあるときは出発地に heading を付ける（360 を超え�
     heading: 10,
     heading_tolerance: 45,
   });
-  assert.equal('heading' in buildRouteRequest(OSAKA, KYOTO, { headingDegrees: -1 }).locations[0], false);
-  assert.equal('heading' in buildRouteRequest(OSAKA, KYOTO, { headingDegrees: null }).locations[0], false);
+  assert.equal(
+    'heading' in buildRouteRequest(OSAKA, KYOTO, { headingDegrees: -1 }).locations[0],
+    false,
+  );
+  assert.equal(
+    'heading' in buildRouteRequest(OSAKA, KYOTO, { headingDegrees: null }).locations[0],
+    false,
+  );
 });
 
 test('答えから距離・時間・曲がる所の数を取り出す', () => {
   const response = {
-    trip: { summary: { length: 47.123, time: 5100 }, legs: [{ maneuvers: [{}, {}, {}] }, { maneuvers: [{}] }] },
+    trip: {
+      summary: { length: 47.123, time: 5100 },
+      legs: [{ maneuvers: [{}, {}, {}] }, { maneuvers: [{}] }],
+    },
   };
-  assert.deepEqual(summarizeRouteResponse(response), { kilometers: 47.1, minutes: 85, maneuverCount: 4 });
+  assert.deepEqual(summarizeRouteResponse(response), {
+    kilometers: 47.1,
+    minutes: 85,
+    maneuverCount: 4,
+  });
   assert.throws(() => summarizeRouteResponse({}));
 });

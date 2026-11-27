@@ -20,7 +20,11 @@ export function clipGaps(lines: string[], maxGapMilliseconds = 3000): ClipGap[] 
       lastFinish = { clipId: entry.clipId, milliseconds };
     } else if (entry.event === 'clip-play' && entry.clipId) {
       if (lastFinish && milliseconds - lastFinish.milliseconds <= maxGapMilliseconds) {
-        gaps.push({ fromClipId: lastFinish.clipId, toClipId: entry.clipId, gapMilliseconds: milliseconds - lastFinish.milliseconds });
+        gaps.push({
+          fromClipId: lastFinish.clipId,
+          toClipId: entry.clipId,
+          gapMilliseconds: milliseconds - lastFinish.milliseconds,
+        });
       }
       lastFinish = null;
     }

@@ -10,7 +10,11 @@ export type InstalledData = { manifest: Manifest | null; problems: string[] };
 /** 入っているデータの素性と、ファイルの足りない・壊れたもの */
 export function readInstalledData(): InstalledData {
   try {
-    if (!MANIFEST_FILE.exists) return { manifest: null, problems: ['manifest.json が無い（Mac で tools/install-data.sh を動かす）'] };
+    if (!MANIFEST_FILE.exists)
+      return {
+        manifest: null,
+        problems: ['manifest.json が無い（Mac で tools/install-data.sh を動かす）'],
+      };
     const manifest = parseManifest(MANIFEST_FILE.textSync());
     if (!manifest) return { manifest: null, problems: ['manifest.json が読めない'] };
     const problems = fileProblems(manifest, (path) => {

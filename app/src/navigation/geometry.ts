@@ -13,7 +13,9 @@ export type LongitudeLatitude = [number, number];
 export function distanceMeters(pointA: LongitudeLatitude, pointB: LongitudeLatitude): number {
   const middleLatitudeRadians = (((pointA[1] + pointB[1]) / 2) * Math.PI) / 180;
   const eastMeters =
-    (pointB[0] - pointA[0]) * Math.cos(middleLatitudeRadians) * METERS_PER_DEGREE_LONGITUDE_AT_EQUATOR;
+    (pointB[0] - pointA[0]) *
+    Math.cos(middleLatitudeRadians) *
+    METERS_PER_DEGREE_LONGITUDE_AT_EQUATOR;
   const northMeters = (pointB[1] - pointA[1]) * METERS_PER_DEGREE_LATITUDE;
   return Math.hypot(eastMeters, northMeters);
 }
@@ -45,7 +47,10 @@ export function nearestPointOnSegment(
     fraction = Math.max(0, Math.min(1, fraction));
   }
   return {
-    distanceMeters: Math.hypot(pointX - startX - fraction * segmentX, pointY - startY - fraction * segmentY),
+    distanceMeters: Math.hypot(
+      pointX - startX - fraction * segmentX,
+      pointY - startY - fraction * segmentY,
+    ),
     fraction: fraction,
   };
 }
@@ -66,7 +71,10 @@ export function pointAlongRoute(
   distanceAlongMeters: number,
 ): LongitudeLatitude {
   let segment = 0;
-  while (segment < cumulativeMeters.length - 2 && cumulativeMeters[segment + 1] < distanceAlongMeters)
+  while (
+    segment < cumulativeMeters.length - 2 &&
+    cumulativeMeters[segment + 1] < distanceAlongMeters
+  )
     segment++;
   const segmentLength = cumulativeMeters[segment + 1] - cumulativeMeters[segment];
   const fraction =

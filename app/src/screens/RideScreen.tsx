@@ -1,6 +1,13 @@
 // 走行中の画面（設計書 5.1〜5.3）。ちらっと見て、次の曲がる所とルートのどこにいるかが分かるようにする。
 // 案内の主役は声で、画面は確かめるためのもの。走っている間に触るのは「全体」と「停止」だけ
-import { Camera, GeoJSONSource, Layer, Map, UserLocation, type CameraRef } from '@maplibre/maplibre-react-native';
+import {
+  Camera,
+  GeoJSONSource,
+  Layer,
+  Map,
+  UserLocation,
+  type CameraRef,
+} from '@maplibre/maplibre-react-native';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Alert, Pressable, StyleSheet, Text, View } from 'react-native';
 
@@ -40,7 +47,10 @@ export function RideScreen({ onStopped }: { onStopped: () => void }) {
     return () => clearInterval(timer);
   }, []);
 
-  const view = useMemo(() => (trip ? progressView(trip.route, trip.state, trip.totalSeconds) : null), [trip]);
+  const view = useMemo(
+    () => (trip ? progressView(trip.route, trip.state, trip.totalSeconds) : null),
+    [trip],
+  );
 
   const showOverview = useCallback(() => {
     if (!trip) return;
@@ -48,7 +58,12 @@ export function RideScreen({ onStopped }: { onStopped: () => void }) {
     const latitudes = trip.route.geometry.map(([, latitude]) => latitude);
     setOverview(true);
     cameraRef.current?.fitBounds(
-      [Math.min(...longitudes), Math.min(...latitudes), Math.max(...longitudes), Math.max(...latitudes)],
+      [
+        Math.min(...longitudes),
+        Math.min(...latitudes),
+        Math.max(...longitudes),
+        Math.max(...latitudes),
+      ],
       { padding: { top: 200, right: 40, bottom: 220, left: 40 }, duration: 500 },
     );
   }, [trip]);
@@ -97,15 +112,63 @@ export function RideScreen({ onStopped }: { onStopped: () => void }) {
           trackUserLocation={overview ? undefined : 'course'}
           initialViewState={{ center: trip.route.geometry[0], zoom: 16 }}
         />
-        <GeoJSONSource id="ride-passed" data={{ type: 'Feature', properties: {}, geometry: { type: 'LineString', coordinates: view.passedCoordinates } }}>
-          <Layer id="ride-passed-line" type="line" layout={{ 'line-cap': 'round', 'line-join': 'round' }} paint={{ 'line-color': ROUTE_COLORS.passed, 'line-width': 7 }} />
+        <GeoJSONSource
+          id="ride-passed"
+          data={{
+            type: 'Feature',
+            properties: {},
+            geometry: { type: 'LineString', coordinates: view.passedCoordinates },
+          }}
+        >
+          <Layer
+            id="ride-passed-line"
+            type="line"
+            layout={{ 'line-cap': 'round', 'line-join': 'round' }}
+            paint={{ 'line-color': ROUTE_COLORS.passed, 'line-width': 7 }}
+          />
         </GeoJSONSource>
-        <GeoJSONSource id="ride-ahead" data={{ type: 'Feature', properties: {}, geometry: { type: 'LineString', coordinates: view.aheadCoordinates } }}>
-          <Layer id="ride-ahead-casing" type="line" layout={{ 'line-cap': 'round', 'line-join': 'round' }} paint={{ 'line-color': ROUTE_COLORS.casing, 'line-width': 10 }} />
-          <Layer id="ride-ahead-line" type="line" layout={{ 'line-cap': 'round', 'line-join': 'round' }} paint={{ 'line-color': ROUTE_COLORS.ahead, 'line-width': 7 }} />
+        <GeoJSONSource
+          id="ride-ahead"
+          data={{
+            type: 'Feature',
+            properties: {},
+            geometry: { type: 'LineString', coordinates: view.aheadCoordinates },
+          }}
+        >
+          <Layer
+            id="ride-ahead-casing"
+            type="line"
+            layout={{ 'line-cap': 'round', 'line-join': 'round' }}
+            paint={{ 'line-color': ROUTE_COLORS.casing, 'line-width': 10 }}
+          />
+          <Layer
+            id="ride-ahead-line"
+            type="line"
+            layout={{ 'line-cap': 'round', 'line-join': 'round' }}
+            paint={{ 'line-color': ROUTE_COLORS.ahead, 'line-width': 7 }}
+          />
         </GeoJSONSource>
-        <GeoJSONSource id="ride-destination" data={{ type: 'Feature', properties: {}, geometry: { type: 'Point', coordinates: [trip.destination.longitude, trip.destination.latitude] } }}>
-          <Layer id="ride-destination-dot" type="circle" paint={{ 'circle-radius': 9, 'circle-color': '#E24B4A', 'circle-stroke-color': '#ffffff', 'circle-stroke-width': 3 }} />
+        <GeoJSONSource
+          id="ride-destination"
+          data={{
+            type: 'Feature',
+            properties: {},
+            geometry: {
+              type: 'Point',
+              coordinates: [trip.destination.longitude, trip.destination.latitude],
+            },
+          }}
+        >
+          <Layer
+            id="ride-destination-dot"
+            type="circle"
+            paint={{
+              'circle-radius': 9,
+              'circle-color': '#E24B4A',
+              'circle-stroke-color': '#ffffff',
+              'circle-stroke-width': 3,
+            }}
+          />
         </GeoJSONSource>
         <UserLocation />
       </Map>
@@ -132,7 +195,9 @@ export function RideScreen({ onStopped }: { onStopped: () => void }) {
         ) : (
           <Text style={styles.bannerMain}>ルートに向かってください</Text>
         )}
-        {trip.rerouteCount > 0 && !trip.arrived && <Text style={styles.bannerNote}>計算し直し {trip.rerouteCount} 回</Text>}
+        {trip.rerouteCount > 0 && !trip.arrived && (
+          <Text style={styles.bannerNote}>計算し直し {trip.rerouteCount} 回</Text>
+        )}
       </View>
 
       {/* 下: ルートのどこにいるか（進み具合の帯）と、残り */}
@@ -156,7 +221,9 @@ export function RideScreen({ onStopped }: { onStopped: () => void }) {
             onPress={overview ? () => setOverview(false) : showOverview}
             style={styles.overviewButton}
           >
-            <Text style={styles.overviewText}>{overview ? '走行中の表示に戻る' : 'ルートの全体'}</Text>
+            <Text style={styles.overviewText}>
+              {overview ? '走行中の表示に戻る' : 'ルートの全体'}
+            </Text>
           </Pressable>
           <Pressable accessibilityRole="button" onPress={confirmStop} style={styles.stopButton}>
             <Text style={styles.stopText}>停止</Text>
@@ -171,24 +238,81 @@ const styles = StyleSheet.create({
   screen: { flex: 1 },
   map: { flex: 1 },
   center: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 12 },
-  banner: { position: 'absolute', top: 52, left: 12, right: 12, borderRadius: 16, paddingVertical: 12, paddingHorizontal: 16 },
+  banner: {
+    position: 'absolute',
+    top: 52,
+    left: 12,
+    right: 12,
+    borderRadius: 16,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+  },
   bannerRow: { flexDirection: 'row', alignItems: 'center', gap: 14 },
   arrow: { fontSize: 52, color: '#ffffff', fontWeight: '700', width: 56, textAlign: 'center' },
   bannerTexts: { flex: 1 },
   bannerMain: { fontSize: 34, fontWeight: '800', color: '#ffffff' },
   bannerSub: { fontSize: 20, fontWeight: '600', color: '#ffffff' },
   bannerNote: { fontSize: 13, color: '#ffffffcc', marginTop: 4 },
-  bottom: { position: 'absolute', left: 12, right: 12, bottom: 28, backgroundColor: '#ffffffee', borderRadius: 16, padding: 14, gap: 10 },
+  bottom: {
+    position: 'absolute',
+    left: 12,
+    right: 12,
+    bottom: 28,
+    backgroundColor: '#ffffffee',
+    borderRadius: 16,
+    padding: 14,
+    gap: 10,
+  },
   strip: { height: 22, justifyContent: 'center' },
-  stripTrack: { position: 'absolute', left: 0, right: 0, height: 6, borderRadius: 3, backgroundColor: '#D3D1C7' },
-  stripPassed: { position: 'absolute', left: 0, height: 6, borderRadius: 3, backgroundColor: '#378ADD' },
-  stripTick: { position: 'absolute', width: 2, height: 14, marginLeft: -1, backgroundColor: '#888780' },
-  stripDot: { position: 'absolute', width: 20, height: 20, marginLeft: -10, borderRadius: 10, backgroundColor: '#185FA5', borderWidth: 3, borderColor: '#ffffff' },
+  stripTrack: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: '#D3D1C7',
+  },
+  stripPassed: {
+    position: 'absolute',
+    left: 0,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: '#378ADD',
+  },
+  stripTick: {
+    position: 'absolute',
+    width: 2,
+    height: 14,
+    marginLeft: -1,
+    backgroundColor: '#888780',
+  },
+  stripDot: {
+    position: 'absolute',
+    width: 20,
+    height: 20,
+    marginLeft: -10,
+    borderRadius: 10,
+    backgroundColor: '#185FA5',
+    borderWidth: 3,
+    borderColor: '#ffffff',
+  },
   remainingRow: { flexDirection: 'row', justifyContent: 'space-between' },
   remainingMain: { fontSize: 22, fontWeight: '700', color: '#2C2C2A' },
   buttons: { flexDirection: 'row', gap: 10 },
-  overviewButton: { flex: 1, borderRadius: 12, paddingVertical: 14, alignItems: 'center', backgroundColor: '#E6F1FB' },
+  overviewButton: {
+    flex: 1,
+    borderRadius: 12,
+    paddingVertical: 14,
+    alignItems: 'center',
+    backgroundColor: '#E6F1FB',
+  },
   overviewText: { fontSize: 16, fontWeight: '700', color: '#0C447C' },
-  stopButton: { borderRadius: 12, paddingVertical: 14, paddingHorizontal: 22, alignItems: 'center', backgroundColor: '#FCEBEB' },
+  stopButton: {
+    borderRadius: 12,
+    paddingVertical: 14,
+    paddingHorizontal: 22,
+    alignItems: 'center',
+    backgroundColor: '#FCEBEB',
+  },
   stopText: { fontSize: 16, fontWeight: '700', color: '#A32D2D' },
 });

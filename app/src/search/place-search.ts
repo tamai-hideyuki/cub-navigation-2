@@ -32,7 +32,10 @@ let database: Promise<SQLiteDatabase> | null = null;
 
 function open(): Promise<SQLiteDatabase> {
   if (!database) {
-    const directory = decodeURIComponent(SEARCH_DIRECTORY.uri.replace('file://', '')).replace(/\/$/, '');
+    const directory = decodeURIComponent(SEARCH_DIRECTORY.uri.replace('file://', '')).replace(
+      /\/$/,
+      '',
+    );
     database = openDatabaseAsync('search.sqlite', { useNewConnection: true }, directory);
   }
   return database;
@@ -42,7 +45,11 @@ export function hasSearchData(): boolean {
   return SEARCH_DATABASE_FILE.exists;
 }
 
-export async function searchPlaces(query: string, here: Coordinate | null, limit = 30): Promise<RankedPlace[]> {
+export async function searchPlaces(
+  query: string,
+  here: Coordinate | null,
+  limit = 30,
+): Promise<RankedPlace[]> {
   const normalized = normalizeSearchText(query);
   if (normalized === '') return [];
   const db = await open();

@@ -12,13 +12,20 @@ export type ProgressView = {
   remainingMeters: number;
   /** 残りの時間（Valhalla の見込みの時間を、残りの距離の割合で割り振る） */
   remainingSeconds: number;
-  nextManeuver: { direction: TurnDirection; roadName: string | null; distanceMeters: number } | null;
+  nextManeuver: {
+    direction: TurnDirection;
+    roadName: string | null;
+    distanceMeters: number;
+  } | null;
   /** 曲がる所の位置（0〜1）。進み具合の帯の目盛り */
   maneuverFractions: number[];
 };
 
 /** ルートを、出発からの距離で2つに分ける。分ける点は両方に入れる（線がつながって見えるように） */
-export function splitRoute(route: Route, distanceAlongMeters: number): { passed: [number, number][]; ahead: [number, number][] } {
+export function splitRoute(
+  route: Route,
+  distanceAlongMeters: number,
+): { passed: [number, number][]; ahead: [number, number][] } {
   const along = Math.max(0, Math.min(distanceAlongMeters, route.totalMeters));
   const point = pointAlongRoute(route.geometry, route.cumulativeMeters, along) as [number, number];
   const firstAheadIndex = route.cumulativeMeters.findIndex((meters) => meters > along);
@@ -29,22 +36,35 @@ export function splitRoute(route: Route, distanceAlongMeters: number): { passed:
   };
 }
 
-export function progressView(route: Route, state: NavigationState, totalSeconds: number): ProgressView {
+export function progressView(
+  route: Route,
+  state: NavigationState,
+  totalSeconds: number,
+): ProgressView {
   const along = state.progress.acquired ? state.progress.distanceAlongMeters : 0;
   const { passed, ahead } = splitRoute(route, along);
   const remainingMeters = Math.max(0, route.totalMeters - along);
-  const next: Maneuver | undefined = route.maneuvers.find((maneuver) => maneuver.distanceAlongMeters > along);
+  const next: Maneuver | undefined = route.maneuvers.find(
+    (maneuver) => maneuver.distanceAlongMeters > along,
+  );
   return {
     passedCoordinates: passed,
     aheadCoordinates: ahead,
     fraction: route.totalMeters > 0 ? along / route.totalMeters : 0,
     remainingMeters,
-    remainingSeconds: route.totalMeters > 0 ? (totalSeconds * remainingMeters) / route.totalMeters : 0,
+    remainingSeconds:
+      route.totalMeters > 0 ? (totalSeconds * remainingMeters) / route.totalMeters : 0,
     nextManeuver: next
-      ? { direction: next.direction, roadName: next.roadName, distanceMeters: next.distanceAlongMeters - along }
+      ? {
+          direction: next.direction,
+          roadName: next.roadName,
+          distanceMeters: next.distanceAlongMeters - along,
+        }
       : null,
     maneuverFractions:
-      route.totalMeters > 0 ? route.maneuvers.map((maneuver) => maneuver.distanceAlongMeters / route.totalMeters) : [],
+      route.totalMeters > 0
+        ? route.maneuvers.map((maneuver) => maneuver.distanceAlongMeters / route.totalMeters)
+        : [],
   };
 }
 

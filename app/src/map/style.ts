@@ -80,7 +80,13 @@ const FONT_BOLD = ['NotoSans-Medium'];
 
 export function buildMapStyle({ tilesUrl, glyphsUrl, theme }: MapStyleOptions) {
   const palette = PALETTES[theme];
-  const road = (id: string, classes: string[], casing: boolean, stops: [number, number][], fill: string) => ({
+  const road = (
+    id: string,
+    classes: string[],
+    casing: boolean,
+    stops: [number, number][],
+    fill: string,
+  ) => ({
     id,
     type: 'line',
     source: 'openmaptiles',
@@ -88,7 +94,10 @@ export function buildMapStyle({ tilesUrl, glyphsUrl, theme }: MapStyleOptions) {
     filter: ['all', ['in', ['get', 'class'], ['literal', classes]], NOT_FORBIDDEN],
     layout: { 'line-cap': 'round', 'line-join': 'round' },
     paint: casing
-      ? { 'line-color': palette.roadCasing, 'line-width': widthByZoom(stops.map(([z, w]) => [z, w + 2])) }
+      ? {
+          'line-color': palette.roadCasing,
+          'line-width': widthByZoom(stops.map(([z, w]) => [z, w + 2])),
+        }
       : { 'line-color': fill, 'line-width': widthByZoom(stops) },
   });
 
@@ -129,13 +138,25 @@ export function buildMapStyle({ tilesUrl, glyphsUrl, theme }: MapStyleOptions) {
         filter: ['in', ['get', 'class'], ['literal', ['grass', 'wood', 'farmland']]],
         paint: { 'fill-color': palette.park, 'fill-opacity': 0.6 },
       },
-      { id: 'water', type: 'fill', source: 'openmaptiles', 'source-layer': 'water', paint: { 'fill-color': palette.water } },
+      {
+        id: 'water',
+        type: 'fill',
+        source: 'openmaptiles',
+        'source-layer': 'water',
+        paint: { 'fill-color': palette.water },
+      },
       {
         id: 'waterway',
         type: 'line',
         source: 'openmaptiles',
         'source-layer': 'waterway',
-        paint: { 'line-color': palette.water, 'line-width': widthByZoom([[10, 0.5], [16, 3]]) },
+        paint: {
+          'line-color': palette.water,
+          'line-width': widthByZoom([
+            [10, 0.5],
+            [16, 3],
+          ]),
+        },
       },
       {
         id: 'building',
@@ -159,7 +180,13 @@ export function buildMapStyle({ tilesUrl, glyphsUrl, theme }: MapStyleOptions) {
         source: 'openmaptiles',
         'source-layer': 'transportation',
         filter: ['==', ['get', 'class'], 'rail'],
-        paint: { 'line-color': palette.rail, 'line-width': widthByZoom([[10, 0.5], [16, 2]]) },
+        paint: {
+          'line-color': palette.rail,
+          'line-width': widthByZoom([
+            [10, 0.5],
+            [16, 2],
+          ]),
+        },
       },
       // 125cc では通れない道: 細く薄い点線にして、通れる道と見分ける
       {
@@ -170,7 +197,10 @@ export function buildMapStyle({ tilesUrl, glyphsUrl, theme }: MapStyleOptions) {
         filter: FORBIDDEN_FILTER,
         paint: {
           'line-color': palette.forbiddenRoad,
-          'line-width': widthByZoom([[8, 1], [18, 8]]),
+          'line-width': widthByZoom([
+            [8, 1],
+            [18, 8],
+          ]),
           'line-dasharray': [2, 1.5],
         },
       },
@@ -187,14 +217,22 @@ export function buildMapStyle({ tilesUrl, glyphsUrl, theme }: MapStyleOptions) {
         'source-layer': 'transportation_name',
         minzoom: 13,
         // 描いている道（通れる道）の名前だけを出す。高速道路・工事中の道の名前は出さない
-        filter: ['in', ['get', 'class'], ['literal', [...MAJOR_CLASSES, ...MIDDLE_CLASSES, ...MINOR_CLASSES]]],
+        filter: [
+          'in',
+          ['get', 'class'],
+          ['literal', [...MAJOR_CLASSES, ...MIDDLE_CLASSES, ...MINOR_CLASSES]],
+        ],
         layout: {
           'symbol-placement': 'line',
           'text-field': LABEL_NAME,
           'text-font': FONT,
           'text-size': 13,
         },
-        paint: { 'text-color': palette.label, 'text-halo-color': palette.labelHalo, 'text-halo-width': 2 },
+        paint: {
+          'text-color': palette.label,
+          'text-halo-color': palette.labelHalo,
+          'text-halo-width': 2,
+        },
       },
       {
         id: 'water-name',
@@ -202,20 +240,32 @@ export function buildMapStyle({ tilesUrl, glyphsUrl, theme }: MapStyleOptions) {
         source: 'openmaptiles',
         'source-layer': 'water_name',
         layout: { 'text-field': LABEL_NAME, 'text-font': FONT, 'text-size': 13 },
-        paint: { 'text-color': palette.waterLabel, 'text-halo-color': palette.labelHalo, 'text-halo-width': 1.5 },
+        paint: {
+          'text-color': palette.waterLabel,
+          'text-halo-color': palette.labelHalo,
+          'text-halo-width': 1.5,
+        },
       },
       {
         id: 'place-name',
         type: 'symbol',
         source: 'openmaptiles',
         'source-layer': 'place',
-        filter: ['in', ['get', 'class'], ['literal', ['city', 'town', 'village', 'suburb', 'quarter']]],
+        filter: [
+          'in',
+          ['get', 'class'],
+          ['literal', ['city', 'town', 'village', 'suburb', 'quarter']],
+        ],
         layout: {
           'text-field': LABEL_NAME,
           'text-font': FONT_BOLD,
           'text-size': ['match', ['get', 'class'], 'city', 18, 'town', 15, 13],
         },
-        paint: { 'text-color': palette.label, 'text-halo-color': palette.labelHalo, 'text-halo-width': 2 },
+        paint: {
+          'text-color': palette.label,
+          'text-halo-color': palette.labelHalo,
+          'text-halo-width': 2,
+        },
       },
     ],
   };

@@ -13,7 +13,8 @@ test('鳴らす声は、どれも作る声の一覧に入っている', () => {
   for (const distance of ['far', 'near'] as const) {
     for (const direction of ['left', 'right', 'uturn', 'arrive'] as const) {
       for (const mode of ['parts', 'joined'] as const) {
-        for (const clipId of guidanceClips(distance, direction, mode)) assert.ok(phrases[clipId], clipId);
+        for (const clipId of guidanceClips(distance, direction, mode))
+          assert.ok(phrases[clipId], clipId);
       }
     }
   }

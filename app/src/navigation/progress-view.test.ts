@@ -3,7 +3,11 @@ import { test } from 'node:test';
 
 import { initialState } from './navigator.ts';
 import { formatDistance, formatDuration, progressView, splitRoute } from './progress-view.ts';
-import { DEFAULT_REROUTE_CONFIGURATION, EMPTY_REROUTE_HISTORY, shouldReroute } from './reroute-policy.ts';
+import {
+  DEFAULT_REROUTE_CONFIGURATION,
+  EMPTY_REROUTE_HISTORY,
+  shouldReroute,
+} from './reroute-policy.ts';
 import { straightTestRoute } from './test-route.ts';
 import type { NavigationState } from './types.ts';
 
@@ -42,7 +46,12 @@ test('外れが確かになったらリルートする。前の計算から間�
   const justTried = { lastAttemptMilliseconds: 100_000, lastAttemptFailed: false };
   assert.equal(shouldReroute(stateAt(250, 'off'), justTried, 110_000, false), false);
   assert.equal(
-    shouldReroute(stateAt(250, 'off'), justTried, 100_000 + DEFAULT_REROUTE_CONFIGURATION.minimumIntervalMilliseconds, false),
+    shouldReroute(
+      stateAt(250, 'off'),
+      justTried,
+      100_000 + DEFAULT_REROUTE_CONFIGURATION.minimumIntervalMilliseconds,
+      false,
+    ),
     true,
   );
   const failed = { lastAttemptMilliseconds: 100_000, lastAttemptFailed: true };

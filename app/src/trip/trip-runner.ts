@@ -13,9 +13,18 @@ import { installedOsmDate } from '../data/manifest';
 import { toLocationReading } from '../location-reading';
 import { writeLog } from '../log';
 import { initialState, step } from '../navigation/navigator';
-import { EMPTY_REROUTE_HISTORY, shouldReroute, type RerouteHistory } from '../navigation/reroute-policy';
+import {
+  EMPTY_REROUTE_HISTORY,
+  shouldReroute,
+  type RerouteHistory,
+} from '../navigation/reroute-policy';
 import { isNavigationState } from '../navigation/saved-state';
-import { COMMON_CLIPS, type LocationReading, type NavigationState, type Route } from '../navigation/types';
+import {
+  COMMON_CLIPS,
+  type LocationReading,
+  type NavigationState,
+  type Route,
+} from '../navigation/types';
 import { buildRouteRequest, summarizeRouteResponse, type Coordinate } from '../routing/request';
 import { audioClipIds, routeFromValhalla } from '../routing/route-from-valhalla';
 
@@ -56,7 +65,8 @@ let mapChanged = false;
 
 async function ensureTilesOpen(): Promise<void> {
   if (isOpen()) return;
-  if (!TILE_EXTRACT_FILE.exists) throw new Error('ルート用のタイルが無い（Documents/valhalla_tiles.tar）');
+  if (!TILE_EXTRACT_FILE.exists)
+    throw new Error('ルート用のタイルが無い（Documents/valhalla_tiles.tar）');
   await openTiles(decodeURIComponent(TILE_EXTRACT_FILE.uri.replace('file://', '')));
 }
 
@@ -94,7 +104,11 @@ function saveRoute(): void {
   try {
     if (!ROUTE_FILE.exists) ROUTE_FILE.create();
     ROUTE_FILE.write(
-      JSON.stringify({ destination: trip.destination, route: trip.route, totalSeconds: trip.totalSeconds }),
+      JSON.stringify({
+        destination: trip.destination,
+        route: trip.route,
+        totalSeconds: trip.totalSeconds,
+      }),
     );
   } catch (error) {
     writeLog('trip-route-write-error', { message: String(error) });
@@ -131,7 +145,10 @@ function loadTrip(): Trip | null {
     let rest: Partial<Trip> = {};
     if (STATE_FILE.exists) {
       const savedState = JSON.parse(STATE_FILE.textSync());
-      if (isNavigationState(savedState.state) && savedState.state.routeComputedAt === route.source.computedAt) {
+      if (
+        isNavigationState(savedState.state) &&
+        savedState.state.routeComputedAt === route.source.computedAt
+      ) {
         state = savedState.state;
         rest = savedState;
       }
@@ -148,7 +165,10 @@ function loadTrip(): Trip | null {
       lastRerouteFailed: rest.lastRerouteFailed ?? false,
     };
     // 保存したルートが前の地図で引いたものなら、新しい地図で引き直す（設計書 9.3）
-    mapChanged = !trip.arrived && route.source.engine === 'valhalla' && route.source.osmDate !== installedOsmDate();
+    mapChanged =
+      !trip.arrived &&
+      route.source.engine === 'valhalla' &&
+      route.source.osmDate !== installedOsmDate();
     if (mapChanged) writeLog('trip-map-changed', { routeOsmDate: route.source.osmDate });
     return trip;
   } catch (error) {
@@ -178,7 +198,11 @@ async function reroute(reading: LocationReading, headingDegrees: number | null):
       lastRerouteFailed: false,
     };
     saveRoute();
-    writeLog('reroute', { milliseconds: Date.now() - started, count: trip.rerouteCount, appState: AppState.currentState });
+    writeLog('reroute', {
+      milliseconds: Date.now() - started,
+      count: trip.rerouteCount,
+      appState: AppState.currentState,
+    });
     await enqueueClips(['common-rerouted']);
   } catch (error) {
     trip = {
@@ -206,7 +230,9 @@ async function handleLocations(locations: Location.LocationObject[]): Promise<vo
         ...trip,
         state: output.state,
         arrived: trip.arrived || justArrived,
-        arrivedAtMilliseconds: justArrived ? reading.timestampMilliseconds : trip.arrivedAtMilliseconds,
+        arrivedAtMilliseconds: justArrived
+          ? reading.timestampMilliseconds
+          : trip.arrivedAtMilliseconds,
       };
       if (audio.length > 0) {
         writeLog('announce', {
@@ -218,13 +244,17 @@ async function handleLocations(locations: Location.LocationObject[]): Promise<vo
       }
       if (
         trip.arrivedAtMilliseconds !== null &&
-        reading.timestampMilliseconds - trip.arrivedAtMilliseconds >= STOP_AFTER_ARRIVAL_MILLISECONDS
+        reading.timestampMilliseconds - trip.arrivedAtMilliseconds >=
+          STOP_AFTER_ARRIVAL_MILLISECONDS
       ) {
         await stopLocationUpdates();
         writeLog('trip-location-stopped-after-arrival');
         break;
       }
-      if (mapChanged || shouldReroute(trip.state, trip.reroute, reading.timestampMilliseconds, trip.arrived)) {
+      if (
+        mapChanged ||
+        shouldReroute(trip.state, trip.reroute, reading.timestampMilliseconds, trip.arrived)
+      ) {
         mapChanged = false;
         const heading = location.coords.heading;
         await reroute(reading, heading !== null && heading >= 0 ? heading : null);
@@ -236,20 +266,26 @@ async function handleLocations(locations: Location.LocationObject[]): Promise<vo
   }
 }
 
-TaskManager.defineTask<{ locations: Location.LocationObject[] }>(TRIP_TASK_NAME, async ({ data, error }) => {
-  if (error) {
-    writeLog('trip-task-error', { message: error.message });
-    return;
-  }
-  if (data?.locations?.length) await handleLocations(data.locations);
-});
+TaskManager.defineTask<{ locations: Location.LocationObject[] }>(
+  TRIP_TASK_NAME,
+  async ({ data, error }) => {
+    if (error) {
+      writeLog('trip-task-error', { message: error.message });
+      return;
+    }
+    if (data?.locations?.length) await handleLocations(data.locations);
+  },
+);
 
 /** 案内を始める。ルートは planRoute で引いたもの */
 export async function startTrip(destination: Coordinate, planned: PlannedRoute): Promise<void> {
   const foreground = await Location.requestForegroundPermissionsAsync();
   if (foreground.status !== 'granted') throw new Error('位置の許可が無い');
   const background = await Location.requestBackgroundPermissionsAsync();
-  if (background.status !== 'granted' && (await Location.getBackgroundPermissionsAsync()).status !== 'granted') {
+  if (
+    background.status !== 'granted' &&
+    (await Location.getBackgroundPermissionsAsync()).status !== 'granted'
+  ) {
     throw new Error('位置の許可を「常に」にする（画面ロック中も案内するため）');
   }
   await prepareAudio();

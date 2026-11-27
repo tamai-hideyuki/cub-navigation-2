@@ -5,7 +5,13 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import { closeTiles, isOpen, memoryFootprintMegabytes, route } from './modules/cub-routing';
 import { readLogTail, writeLog } from './src/log';
-import { ensureTilesOpen, isProbing, startProbe, stopProbe, TILE_EXTRACT_FILE } from './src/poc5/background-probe';
+import {
+  ensureTilesOpen,
+  isProbing,
+  startProbe,
+  stopProbe,
+  TILE_EXTRACT_FILE,
+} from './src/poc5/background-probe';
 import { PAIRS, PLACES } from './src/poc5/places';
 import { VoiceScreen } from './src/poc6/VoiceScreen';
 import { MapScreen } from './src/poc7/MapScreen';
@@ -24,7 +30,10 @@ export default function App() {
   // 走行中にアプリを開き直したら、走行中の画面に戻す
   useEffect(() => {
     isTripRunning().then(async (running) => {
-      if (running) await resumeTripIfNeeded().catch((error) => writeLog('trip-resume-error', { message: String(error) }));
+      if (running)
+        await resumeTripIfNeeded().catch((error) =>
+          writeLog('trip-resume-error', { message: String(error) }),
+        );
       setMode(running ? 'ride' : 'plan');
     });
   }, []);
@@ -32,7 +41,12 @@ export default function App() {
   return (
     <View style={styles.root}>
       <StatusBar style="dark" />
-      {mode === 'plan' && <PlanScreen onStarted={() => setMode('ride')} onOpenDevelopment={() => setMode('development')} />}
+      {mode === 'plan' && (
+        <PlanScreen
+          onStarted={() => setMode('ride')}
+          onOpenDevelopment={() => setMode('development')}
+        />
+      )}
       {mode === 'ride' && <RideScreen onStopped={() => setMode('plan')} />}
       {mode === 'development' && <DevelopmentScreen onClose={() => setMode('plan')} />}
     </View>
@@ -60,7 +74,15 @@ function DevelopmentScreen({ onClose }: { onClose: () => void }) {
   );
 }
 
-function TabButton({ label, selected, onPress }: { label: string; selected: boolean; onPress: () => void }) {
+function TabButton({
+  label,
+  selected,
+  onPress,
+}: {
+  label: string;
+  selected: boolean;
+  onPress: () => void;
+}) {
   return (
     <Pressable
       accessibilityRole="tab"
@@ -103,11 +125,15 @@ function Poc5Screen() {
       add(`開く前のメモリ ${Math.round(memoryFootprintMegabytes())}MB`);
       if (isOpen()) closeTiles();
       const openMilliseconds = await ensureTilesOpen();
-      add(`タイルを開いた ${Math.round(openMilliseconds ?? 0)}ms・メモリ ${Math.round(memoryFootprintMegabytes())}MB`);
+      add(
+        `タイルを開いた ${Math.round(openMilliseconds ?? 0)}ms・メモリ ${Math.round(memoryFootprintMegabytes())}MB`,
+      );
       // 1回目はタイルを読み込むので遅い。同じ組を2回計算して、2回目の速さも見る
       for (const round of [1, 2]) {
         for (const pair of PAIRS) {
-          const request = buildRouteRequest(PLACES[pair.from], PLACES[pair.to], { departAt: BENCHMARK_DEPARTURE });
+          const request = buildRouteRequest(PLACES[pair.from], PLACES[pair.to], {
+            departAt: BENCHMARK_DEPARTURE,
+          });
           try {
             const result = await route(request);
             const summary = summarizeRouteResponse(result.response);
@@ -117,7 +143,12 @@ function Poc5Screen() {
                 ` ${summary.minutes}分 計算 ${Math.round(result.milliseconds)}ms`,
               differenceKilometers > 0.5,
             );
-            writeLog('benchmark-route', { round, ...pair, ...summary, milliseconds: Math.round(result.milliseconds) });
+            writeLog('benchmark-route', {
+              round,
+              ...pair,
+              ...summary,
+              milliseconds: Math.round(result.milliseconds),
+            });
           } catch (error) {
             add(`${round}回目 ${pair.from}→${pair.to} 失敗: ${String(error)}`, true);
           }
@@ -178,7 +209,10 @@ function Poc5Screen() {
       <View style={styles.buttons}>
         <Button label={busy ? '計算中…' : '速さを測る'} onPress={runBenchmark} disabled={busy} />
         <Button label="時間帯の規制を試す" onPress={runTimeCheck} disabled={busy} />
-        <Button label={probing ? 'ロック中のテストを止める' : 'ロック中のテストを始める'} onPress={toggleProbe} />
+        <Button
+          label={probing ? 'ロック中のテストを止める' : 'ロック中のテストを始める'}
+          onPress={toggleProbe}
+        />
         <Button label="記録を更新" onPress={refresh} />
       </View>
       <ScrollView style={styles.output}>
@@ -194,7 +228,15 @@ function Poc5Screen() {
   );
 }
 
-function Button({ label, onPress, disabled }: { label: string; onPress: () => void; disabled?: boolean }) {
+function Button({
+  label,
+  onPress,
+  disabled,
+}: {
+  label: string;
+  onPress: () => void;
+  disabled?: boolean;
+}) {
   return (
     <Pressable
       accessibilityRole="button"
@@ -210,7 +252,13 @@ function Button({ label, onPress, disabled }: { label: string; onPress: () => vo
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: '#ffffff' },
   tabs: { position: 'absolute', top: 56, left: 16, right: 16, flexDirection: 'row', gap: 8 },
-  tab: { flex: 1, borderRadius: 8, paddingVertical: 8, alignItems: 'center', backgroundColor: '#ffffffdd' },
+  tab: {
+    flex: 1,
+    borderRadius: 8,
+    paddingVertical: 8,
+    alignItems: 'center',
+    backgroundColor: '#ffffffdd',
+  },
   tabSelected: { backgroundColor: '#185FA5' },
   tabText: { fontSize: 14, color: '#185FA5', fontWeight: '600' },
   tabTextSelected: { color: '#ffffff' },
@@ -218,7 +266,12 @@ const styles = StyleSheet.create({
   title: { fontSize: 20, fontWeight: '600', marginBottom: 4 },
   status: { fontSize: 14, color: '#555555', marginBottom: 12 },
   buttons: { gap: 8, marginBottom: 12 },
-  button: { backgroundColor: '#185FA5', borderRadius: 8, paddingVertical: 12, alignItems: 'center' },
+  button: {
+    backgroundColor: '#185FA5',
+    borderRadius: 8,
+    paddingVertical: 12,
+    alignItems: 'center',
+  },
   buttonPressed: { opacity: 0.6 },
   buttonText: { color: '#ffffff', fontSize: 16, fontWeight: '600' },
   output: { flex: 1 },

@@ -39,7 +39,9 @@ async function probe(location: Location.LocationObject): Promise<void> {
   try {
     const openMilliseconds = await ensureTilesOpen();
     const result = await route(
-      buildRouteRequest(origin, destination, { headingDegrees: insideArea ? location.coords.heading : null }),
+      buildRouteRequest(origin, destination, {
+        headingDegrees: insideArea ? location.coords.heading : null,
+      }),
     );
     const summary = summarizeRouteResponse(result.response);
     writeLog('probe-route', {
@@ -52,26 +54,34 @@ async function probe(location: Location.LocationObject): Promise<void> {
       memoryMegabytes: Math.round(memoryFootprintMegabytes()),
     });
   } catch (error) {
-    writeLog('probe-error', { appState, insideArea, wallMilliseconds: Date.now() - started, message: String(error) });
+    writeLog('probe-error', {
+      appState,
+      insideArea,
+      wallMilliseconds: Date.now() - started,
+      message: String(error),
+    });
   }
 }
 
-TaskManager.defineTask<{ locations: Location.LocationObject[] }>(PROBE_TASK_NAME, async ({ data, error }) => {
-  if (error) {
-    writeLog('probe-task-error', { message: error.message });
-    return;
-  }
-  const latest = data?.locations?.at(-1);
-  if (!latest || probing) return;
-  if (latest.timestamp - lastProbeMilliseconds < PROBE_INTERVAL_MILLISECONDS) return;
-  lastProbeMilliseconds = latest.timestamp;
-  probing = true;
-  try {
-    await probe(latest);
-  } finally {
-    probing = false;
-  }
-});
+TaskManager.defineTask<{ locations: Location.LocationObject[] }>(
+  PROBE_TASK_NAME,
+  async ({ data, error }) => {
+    if (error) {
+      writeLog('probe-task-error', { message: error.message });
+      return;
+    }
+    const latest = data?.locations?.at(-1);
+    if (!latest || probing) return;
+    if (latest.timestamp - lastProbeMilliseconds < PROBE_INTERVAL_MILLISECONDS) return;
+    lastProbeMilliseconds = latest.timestamp;
+    probing = true;
+    try {
+      await probe(latest);
+    } finally {
+      probing = false;
+    }
+  },
+);
 
 /**
  * 位置の許可を「常に」にしてもらう。
@@ -82,7 +92,9 @@ async function requestAlwaysPermission(): Promise<boolean> {
   const requested = await Location.requestBackgroundPermissionsAsync();
   if (requested.status === 'granted') return true;
   for (let attempt = 0; attempt < ALWAYS_PERMISSION_RECHECK_COUNT; attempt++) {
-    await new Promise((resolve) => setTimeout(resolve, ALWAYS_PERMISSION_RECHECK_INTERVAL_MILLISECONDS));
+    await new Promise((resolve) =>
+      setTimeout(resolve, ALWAYS_PERMISSION_RECHECK_INTERVAL_MILLISECONDS),
+    );
     if ((await Location.getBackgroundPermissionsAsync()).status === 'granted') return true;
   }
   return false;

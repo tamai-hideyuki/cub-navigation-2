@@ -91,7 +91,9 @@ export class ClipQueue {
   }
 
   private hasPlaybackTimedOut(nowMilliseconds: number): boolean {
-    return nowMilliseconds - this.currentStartedMilliseconds >= this.options.playbackTimeoutMilliseconds;
+    return (
+      nowMilliseconds - this.currentStartedMilliseconds >= this.options.playbackTimeoutMilliseconds
+    );
   }
 
   private timeOutCurrentPlayback(): void {

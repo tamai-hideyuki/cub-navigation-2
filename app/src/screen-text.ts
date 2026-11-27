@@ -1,5 +1,10 @@
 // 画面に出す文（純粋な関数）
-import type { NavigationOutput, NavigationState, OffRouteStatus, Route } from './navigation/types.ts';
+import type {
+  NavigationOutput,
+  NavigationState,
+  OffRouteStatus,
+  Route,
+} from './navigation/types.ts';
 
 const OFF_ROUTE_LABELS: Record<OffRouteStatus, string> = {
   on: 'ルート上',
@@ -28,7 +33,9 @@ export function screenLines(
 
   const distanceToRoute = debug?.distanceToRouteMeters;
   const distanceText =
-    distanceToRoute === null || distanceToRoute === undefined ? '—' : `${Math.round(distanceToRoute)} m`;
+    distanceToRoute === null || distanceToRoute === undefined
+      ? '—'
+      : `${Math.round(distanceToRoute)} m`;
   const positionLabel = acquired ? OFF_ROUTE_LABELS[state.offRoute.status] : 'まだ合っていない';
 
   const nextManeuver = route.maneuvers.find((maneuver) => maneuver.id === debug?.nextManeuverId);

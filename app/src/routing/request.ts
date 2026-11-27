@@ -35,15 +35,22 @@ export const COSTING_OPTIONS = {
 /** 進む向きの許す幅（度）。Valhalla の既定は 60 */
 const HEADING_TOLERANCE_DEGREES = 45;
 
-export function buildRouteRequest(origin: Coordinate, destination: Coordinate, options: RouteRequestOptions = {}) {
+export function buildRouteRequest(
+  origin: Coordinate,
+  destination: Coordinate,
+  options: RouteRequestOptions = {},
+) {
   const heading = options.headingDegrees;
-  const hasHeading = heading !== null && heading !== undefined && Number.isFinite(heading) && heading >= 0;
+  const hasHeading =
+    heading !== null && heading !== undefined && Number.isFinite(heading) && heading >= 0;
   return {
     locations: [
       {
         lon: origin.longitude,
         lat: origin.latitude,
-        ...(hasHeading ? { heading: Math.round(heading) % 360, heading_tolerance: HEADING_TOLERANCE_DEGREES } : {}),
+        ...(hasHeading
+          ? { heading: Math.round(heading) % 360, heading_tolerance: HEADING_TOLERANCE_DEGREES }
+          : {}),
       },
       { lon: destination.longitude, lat: destination.latitude },
     ],
@@ -62,8 +69,16 @@ export function formatJapanTime(date: Date): string {
 }
 
 /** Valhalla の答えから、距離（km）・時間（分）・曲がる所の数を取り出す */
-export function summarizeRouteResponse(response: unknown): { kilometers: number; minutes: number; maneuverCount: number } {
-  const trip = (response as { trip?: { summary?: { length?: number; time?: number }; legs?: { maneuvers?: unknown[] }[] } }).trip;
+export function summarizeRouteResponse(response: unknown): {
+  kilometers: number;
+  minutes: number;
+  maneuverCount: number;
+} {
+  const trip = (
+    response as {
+      trip?: { summary?: { length?: number; time?: number }; legs?: { maneuvers?: unknown[] }[] };
+    }
+  ).trip;
   if (!trip?.summary) throw new Error('Valhalla の答えに trip.summary が無い');
   return {
     kilometers: Math.round((trip.summary.length ?? 0) * 10) / 10,

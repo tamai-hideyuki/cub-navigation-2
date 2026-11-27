@@ -1,5 +1,9 @@
 // テスト用の L 字のルート: 東へまっすぐ 1km → 北へ 1km（緯度 35 度付近）。角で左折、北の端で到着
-import { cumulativeDistances, METERS_PER_DEGREE_LATITUDE, metersPerDegreeLongitude } from './geometry.ts';
+import {
+  cumulativeDistances,
+  METERS_PER_DEGREE_LATITUDE,
+  metersPerDegreeLongitude,
+} from './geometry.ts';
 import type { LocationReading, Route } from './types.ts';
 
 const ORIGIN: [number, number] = [139.0, 35.0];
@@ -49,7 +53,11 @@ function buildTestRoute(): Route {
 export const TEST_ROUTE = buildTestRoute();
 
 /** 原点から東へ・北へ何 m の所の、second 秒目の位置（精度 5m） */
-export function readingAt(eastMeters: number, northMeters: number, second: number): LocationReading {
+export function readingAt(
+  eastMeters: number,
+  northMeters: number,
+  second: number,
+): LocationReading {
   const [longitude, latitude] = offsetFromOrigin(eastMeters, northMeters);
   return {
     latitude: latitude,

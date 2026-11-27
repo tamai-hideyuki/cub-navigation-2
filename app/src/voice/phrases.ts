@@ -43,8 +43,14 @@ export const COMMON_TEXT: Record<string, string> = {
  */
 export type JoinMode = 'parts' | 'joined';
 
-export function guidanceClips(distance: GuidanceDistance, direction: TurnDirection, mode: JoinMode): ClipId[] {
-  return mode === 'joined' ? [`joined-${distance}-${direction}`] : [`part-${distance}`, `part-${direction}`];
+export function guidanceClips(
+  distance: GuidanceDistance,
+  direction: TurnDirection,
+  mode: JoinMode,
+): ClipId[] {
+  return mode === 'joined'
+    ? [`joined-${distance}-${direction}`]
+    : [`part-${distance}`, `part-${direction}`];
 }
 
 /** 作る声の全部（ID → 読む文） */
@@ -56,7 +62,8 @@ export function allPhrases(): Record<ClipId, string> {
   for (const direction of directions) phrases[`part-${direction}`] = DIRECTION_TEXT[direction];
   for (const distance of distances) {
     for (const direction of directions) {
-      phrases[`joined-${distance}-${direction}`] = DISTANCE_TEXT[distance] + DIRECTION_TEXT[direction];
+      phrases[`joined-${distance}-${direction}`] =
+        DISTANCE_TEXT[distance] + DIRECTION_TEXT[direction];
     }
   }
   return phrases;

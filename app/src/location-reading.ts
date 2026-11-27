@@ -4,7 +4,9 @@ import type { LocationObject } from 'expo-location';
 import type { LocationReading } from './navigation/types.ts';
 
 /** 速さが取れないとき iOS は負の値を返すので、null に直す */
-export function toLocationReading(location: Pick<LocationObject, 'coords' | 'timestamp'>): LocationReading {
+export function toLocationReading(
+  location: Pick<LocationObject, 'coords' | 'timestamp'>,
+): LocationReading {
   const speed = location.coords.speed;
   return {
     latitude: location.coords.latitude,
@@ -16,7 +18,11 @@ export function toLocationReading(location: Pick<LocationObject, 'coords' | 'tim
 }
 
 /** 記録が大きくなりすぎないように、位置は interval 件ごとに1行だけ残す。今回の束でその区切りをまたいだか */
-export function crossedLogInterval(readingCountAfter: number, batchSize: number, interval: number): boolean {
+export function crossedLogInterval(
+  readingCountAfter: number,
+  batchSize: number,
+  interval: number,
+): boolean {
   return readingCountAfter % interval < batchSize;
 }
 

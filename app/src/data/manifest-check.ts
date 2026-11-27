@@ -16,7 +16,12 @@ export type Manifest = {
 export function parseManifest(text: string): Manifest | null {
   try {
     const value = JSON.parse(text);
-    if (typeof value?.osmDate !== 'string' || typeof value?.files !== 'object' || value.files === null) return null;
+    if (
+      typeof value?.osmDate !== 'string' ||
+      typeof value?.files !== 'object' ||
+      value.files === null
+    )
+      return null;
     for (const entry of Object.values(value.files) as ManifestFile[]) {
       if (typeof entry?.path !== 'string' || typeof entry?.bytes !== 'number') return null;
     }
@@ -30,12 +35,16 @@ export function parseManifest(text: string): Manifest | null {
  * 入っているファイルの大きさが manifest と合うかを見て、合わないファイルの説明を返す。
  * sha256 は、大きいファイル（約 800MB）を起動のたびに読むことになるので見ない。写す途中で止まったファイルは大きさで分かる
  */
-export function fileProblems(manifest: Manifest, sizeOf: (path: string) => number | null): string[] {
+export function fileProblems(
+  manifest: Manifest,
+  sizeOf: (path: string) => number | null,
+): string[] {
   const problems: string[] = [];
   for (const entry of Object.values(manifest.files)) {
     const size = sizeOf(entry.path);
     if (size === null) problems.push(`${entry.path} が無い`);
-    else if (size !== entry.bytes) problems.push(`${entry.path} の大きさが違う（写す途中で止まった？）`);
+    else if (size !== entry.bytes)
+      problems.push(`${entry.path} の大きさが違う（写す途中で止まった？）`);
   }
   return problems;
 }

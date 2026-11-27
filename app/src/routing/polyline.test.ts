@@ -9,7 +9,10 @@ test('精度 6 桁の polyline を [経度, 緯度] に戻す', () => {
   const encoded = '_izlhA~rlgdF_{geC~ywl@_kwzCn`{nI';
   const coordinates = decodePolyline6(encoded);
   assert.equal(coordinates.length, 3);
-  const rounded = coordinates.map(([longitude, latitude]) => [Number(longitude.toFixed(3)), Number(latitude.toFixed(3))]);
+  const rounded = coordinates.map(([longitude, latitude]) => [
+    Number(longitude.toFixed(3)),
+    Number(latitude.toFixed(3)),
+  ]);
   assert.deepEqual(rounded, [
     [-120.2, 38.5],
     [-120.95, 40.7],

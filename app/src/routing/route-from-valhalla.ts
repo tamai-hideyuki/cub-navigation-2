@@ -4,7 +4,14 @@
 // - 前の曲がる所から 30m 未満なら案内しない（交差点の中の小さな折れ）。到着は必ず残す
 // - 前の曲がる所から 400m 未満なら far（300m 手前）を鳴らさない
 import { cumulativeDistances } from '../navigation/geometry.ts';
-import { COMMON_CLIPS, DEFAULT_CONFIGURATION, type ClipId, type Maneuver, type Route, type TurnDirection } from '../navigation/types.ts';
+import {
+  COMMON_CLIPS,
+  DEFAULT_CONFIGURATION,
+  type ClipId,
+  type Maneuver,
+  type Route,
+  type TurnDirection,
+} from '../navigation/types.ts';
 import { decodePolyline6 } from './polyline.ts';
 
 const MERGE_DISTANCE_METERS = 30;
@@ -38,7 +45,9 @@ export const DIRECTION_BY_VALHALLA_TYPE: Record<number, TurnDirection> = {
 
 type ValhallaManeuver = { type: number; begin_shape_index: number; street_names?: string[] };
 type ValhallaLeg = { shape: string; maneuvers: ValhallaManeuver[] };
-type ValhallaResponse = { trip: { legs: ValhallaLeg[]; summary: { length: number; time: number } } };
+type ValhallaResponse = {
+  trip: { legs: ValhallaLeg[]; summary: { length: number; time: number } };
+};
 
 export type RouteSource = { engine: string; osmDate: string; computedAt: string };
 
@@ -52,7 +61,8 @@ export function routeFromValhalla(response: unknown, name: string, source: Route
   if (!trip?.legs?.length) throw new Error('Valhalla の答えに trip.legs が無い');
   // 経由地を使わないので脚（leg）は1本。2本以上なら形をつなぎ、曲がる所の番号をずらす
   const geometry: [number, number][] = [];
-  const turnPoints: { pointIndex: number; direction: TurnDirection; roadName: string | null }[] = [];
+  const turnPoints: { pointIndex: number; direction: TurnDirection; roadName: string | null }[] =
+    [];
   for (const leg of trip.legs) {
     const offset = geometry.length === 0 ? 0 : geometry.length - 1;
     const shape = decodePolyline6(leg.shape);
@@ -74,7 +84,8 @@ export function routeFromValhalla(response: unknown, name: string, source: Route
     const previous = selected.at(-1);
     const tooClose =
       previous !== undefined &&
-      cumulativeMeters[turnPoint.pointIndex] - cumulativeMeters[previous.pointIndex] < MERGE_DISTANCE_METERS;
+      cumulativeMeters[turnPoint.pointIndex] - cumulativeMeters[previous.pointIndex] <
+        MERGE_DISTANCE_METERS;
     if (tooClose && turnPoint.direction !== 'arrive') continue;
     selected.push(turnPoint);
   }

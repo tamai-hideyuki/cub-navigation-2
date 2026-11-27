@@ -26,7 +26,12 @@ export type RankedPlace = Place & { distanceMeters: number | null; matchLevel: 0
  */
 const DISTANCE_WEIGHT = 10;
 
-export function rankPlaces(places: Place[], query: string, here: Coordinate | null, limit: number): RankedPlace[] {
+export function rankPlaces(
+  places: Place[],
+  query: string,
+  here: Coordinate | null,
+  limit: number,
+): RankedPlace[] {
   const normalizedQuery = normalizeSearchText(query);
   const ranked = places.map((place): RankedPlace => {
     const normalizedName = normalizeSearchText(place.name);
@@ -35,7 +40,8 @@ export function rankPlaces(places: Place[], query: string, here: Coordinate | nu
     const matchLevel: 0 | 1 | 2 =
       normalizedName === normalizedQuery || readings.includes(normalizedQuery)
         ? 0
-        : normalizedName.startsWith(normalizedQuery) || readings.some((reading) => reading.startsWith(normalizedQuery))
+        : normalizedName.startsWith(normalizedQuery) ||
+            readings.some((reading) => reading.startsWith(normalizedQuery))
           ? 1
           : 2;
     const meters = here
@@ -45,8 +51,12 @@ export function rankPlaces(places: Place[], query: string, here: Coordinate | nu
   });
   const score = (place: RankedPlace) =>
     place.priority -
-    (place.distanceMeters === null ? 0 : DISTANCE_WEIGHT * Math.log10(1 + place.distanceMeters / 1000));
-  ranked.sort((a, b) => a.matchLevel - b.matchLevel || score(b) - score(a) || a.name.length - b.name.length);
+    (place.distanceMeters === null
+      ? 0
+      : DISTANCE_WEIGHT * Math.log10(1 + place.distanceMeters / 1000));
+  ranked.sort(
+    (a, b) => a.matchLevel - b.matchLevel || score(b) - score(a) || a.name.length - b.name.length,
+  );
   return ranked.slice(0, limit);
 }
 

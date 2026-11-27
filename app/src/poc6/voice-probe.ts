@@ -27,27 +27,31 @@ const ROTATION: { distance: GuidanceDistance; direction: TurnDirection }[] = [
 let lastProbeMilliseconds = 0;
 let probeCount = 0;
 
-TaskManager.defineTask<{ locations: Location.LocationObject[] }>(VOICE_PROBE_TASK_NAME, async ({ data, error }) => {
-  if (error) {
-    writeLog('voice-probe-task-error', { message: error.message });
-    return;
-  }
-  const latest = data?.locations?.at(-1);
-  if (!latest || latest.timestamp - lastProbeMilliseconds < PROBE_INTERVAL_MILLISECONDS) return;
-  lastProbeMilliseconds = latest.timestamp;
-  const guidance = ROTATION[Math.floor(probeCount / 2) % ROTATION.length];
-  const mode: JoinMode = probeCount % 2 === 0 ? 'parts' : 'joined';
-  probeCount++;
-  writeLog('voice-probe', { appState: AppState.currentState, mode, ...guidance });
-  await enqueueClips(guidanceClips(guidance.distance, guidance.direction, mode));
-});
+TaskManager.defineTask<{ locations: Location.LocationObject[] }>(
+  VOICE_PROBE_TASK_NAME,
+  async ({ data, error }) => {
+    if (error) {
+      writeLog('voice-probe-task-error', { message: error.message });
+      return;
+    }
+    const latest = data?.locations?.at(-1);
+    if (!latest || latest.timestamp - lastProbeMilliseconds < PROBE_INTERVAL_MILLISECONDS) return;
+    lastProbeMilliseconds = latest.timestamp;
+    const guidance = ROTATION[Math.floor(probeCount / 2) % ROTATION.length];
+    const mode: JoinMode = probeCount % 2 === 0 ? 'parts' : 'joined';
+    probeCount++;
+    writeLog('voice-probe', { appState: AppState.currentState, mode, ...guidance });
+    await enqueueClips(guidanceClips(guidance.distance, guidance.direction, mode));
+  },
+);
 
 export async function startVoiceProbe(): Promise<void> {
   const foreground = await Location.requestForegroundPermissionsAsync();
   if (foreground.status !== 'granted') throw new Error('位置の許可が無い');
   if ((await Location.getBackgroundPermissionsAsync()).status !== 'granted') {
     const background = await Location.requestBackgroundPermissionsAsync();
-    if (background.status !== 'granted') throw new Error('位置の許可を「常に」にする（PoC 5 の画面で一度許可するとよい）');
+    if (background.status !== 'granted')
+      throw new Error('位置の許可を「常に」にする（PoC 5 の画面で一度許可するとよい）');
   }
   lastProbeMilliseconds = 0;
   probeCount = 0;
