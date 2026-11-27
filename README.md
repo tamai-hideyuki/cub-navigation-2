@@ -9,6 +9,41 @@
 - 125cc以下が通れない道は、地図のデータそのものから消しておく。これによって、iPhoneの計算は、消した後の地図しか知らないので、どんなルートを計算しても通れない道は通らない
 - iPhone側は、通信を使わない：ルートの計算も地図の表示も、iPhoneの中に入れたデータだけで行う（これによって、圏外でもリルートできる）
 
+### フォルダの構成
+```
+cub-navigation-2/
+├── README.md
+├── docs/                  説明書き
+│   ├── use.md             使い方
+│   └── design.md          設計書
+├── tiles/                 PC側：通れない道を消した地図を作る
+│   ├── prepare.sh         OSM のデータを取って切る
+│   ├── select_removals.py 通れない道を選ぶ
+│   ├── blocklist.json     消す道の一覧（根拠つき）
+│   ├── allowlist.json     調べて通れると分かった道
+│   ├── build_map.sh       地図用のタイルを作る
+│   ├── verify_routes.py   消した道を通らないか確かめる
+│   ├── update.sh          地図と検索のデータをまとめて作り直す
+│   └── data/              作った地図・走行の記録（git に入れない）
+├── tools/                 Mac と iPhone の間の出し入れ
+│   ├── install-iphone.sh  地図を新しくして、アプリごと iPhone に入れる
+│   ├── install-data.sh    地図のデータだけ iPhone に写す
+│   └── pull-logs.sh       走行の記録を Mac に写す
+└── app/                   iPhone側（Expo アプリ）
+    ├── index.ts           起動の入口
+    ├── App.tsx            画面の切り替え
+    ├── modules/cub-routing/  ルートの計算（Valhalla）
+    ├── assets/voice/      案内の音声
+    └── src/
+        ├── screens/       画面（目的地を決める・走行中）
+        ├── trip/          走行中の処理
+        ├── navigation/    ナビの本体
+        ├── routing/       Valhalla の答えをルートに直す
+        ├── map/           地図の表示
+        ├── search/        名前で場所を探す
+        └── voice/         鳴らす言葉
+```
+
 ### PC側
 地図を作り直す時にだけ動かす
 1. 地図のデータを取って切る（prepare.sh、make_area.py）
