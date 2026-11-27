@@ -125,9 +125,9 @@ function Poc5Screen() {
       add(`開く前のメモリ ${Math.round(memoryFootprintMegabytes())}MB`);
       if (isOpen()) closeTiles();
       const openMilliseconds = await ensureTilesOpen();
-      add(
-        `タイルを開いた ${Math.round(openMilliseconds ?? 0)}ms・メモリ ${Math.round(memoryFootprintMegabytes())}MB`,
-      );
+      const openText = Math.round(openMilliseconds ?? 0);
+      const memoryText = Math.round(memoryFootprintMegabytes());
+      add(`タイルを開いた ${openText}ms・メモリ ${memoryText}MB`);
       // 1回目はタイルを読み込むので遅い。同じ組を2回計算して、2回目の速さも見る
       for (const round of [1, 2]) {
         for (const pair of PAIRS) {
@@ -139,7 +139,8 @@ function Poc5Screen() {
             const summary = summarizeRouteResponse(result.response);
             const differenceKilometers = Math.abs(summary.kilometers - pair.desktopKilometers);
             add(
-              `${round}回目 ${pair.from}→${pair.to} ${summary.kilometers}km（PC ${pair.desktopKilometers}）` +
+              `${round}回目 ${pair.from}→${pair.to}` +
+                ` ${summary.kilometers}km（PC ${pair.desktopKilometers}）` +
                 ` ${summary.minutes}分 計算 ${Math.round(result.milliseconds)}ms`,
               differenceKilometers > 0.5,
             );

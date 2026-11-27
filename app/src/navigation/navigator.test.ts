@@ -232,7 +232,8 @@ for (const gapKilometers of [2.5, 12]) {
     const { played } = driveStraight(positionsWithGap(3500, gapKilometers * 1000));
     assert.equal(played.filter((clipId) => clipId === 'common-offroute').length, 0);
     const resumeAt = 3500 + gapKilometers * 1000;
-    const firstManeuverAfterGap = `turn-${String(Math.ceil(resumeAt / 1000)).padStart(3, '0')}-near`;
+    const firstKilometer = String(Math.ceil(resumeAt / 1000)).padStart(3, '0');
+    const firstManeuverAfterGap = `turn-${firstKilometer}-near`;
     assert.ok(
       played.includes(firstManeuverAfterGap),
       `${firstManeuverAfterGap} が鳴らない: ${played.join(',')}`,

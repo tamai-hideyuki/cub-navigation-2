@@ -40,8 +40,9 @@ export function VoiceScreen() {
     }
     const recent = gaps.slice(-5);
     const sorted = gaps.map((gap) => gap.gapMilliseconds).sort((a, b) => a - b);
+    const middle = sorted[Math.floor(sorted.length / 2)];
     setGapText(
-      `つなぎ目 ${gaps.length} 回・真ん中 ${sorted[Math.floor(sorted.length / 2)]}ms・最大 ${sorted.at(-1)}ms\n` +
+      `つなぎ目 ${gaps.length} 回・真ん中 ${middle}ms・最大 ${sorted.at(-1)}ms\n` +
         recent
           .map((gap) => `${gap.fromClipId} → ${gap.toClipId}: ${gap.gapMilliseconds}ms`)
           .join('\n'),

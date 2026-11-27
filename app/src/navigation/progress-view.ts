@@ -99,5 +99,7 @@ export function formatDuration(seconds: number): string {
 /** 着く時刻（HH:MM） */
 export function formatArrival(nowMilliseconds: number, remainingSeconds: number): string {
   const arrival = new Date(nowMilliseconds + remainingSeconds * 1000);
-  return `${String(arrival.getHours()).padStart(2, '0')}:${String(arrival.getMinutes()).padStart(2, '0')}`;
+  const hours = String(arrival.getHours()).padStart(2, '0');
+  const minutes = String(arrival.getMinutes()).padStart(2, '0');
+  return `${hours}:${minutes}`;
 }

@@ -57,9 +57,11 @@ export function MapScreen() {
         properties: {},
         geometry: { type: 'LineString', coordinates },
       });
+      const from = isInsideArea(here) ? '現在地' : '大阪駅';
+      const memory = Math.round(memoryFootprintMegabytes());
       setMessage(
-        `${isInsideArea(here) ? '現在地' : '大阪駅'}→京都駅 ${summary.kilometers}km ${summary.minutes}分` +
-          `・計算 ${Math.round(result.milliseconds)}ms・メモリ ${Math.round(memoryFootprintMegabytes())}MB`,
+        `${from}→京都駅 ${summary.kilometers}km ${summary.minutes}分` +
+          `・計算 ${Math.round(result.milliseconds)}ms・メモリ ${memory}MB`,
       );
     } catch (error) {
       setMessage(`失敗: ${String(error)}`);
