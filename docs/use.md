@@ -50,10 +50,14 @@ npm run iphone
 - 着いたら: 「目的地に着きました」と鳴り、2 分後に位置の取得が止まる。「停止」を押すと、目的地を決める画面に戻る。途中でアプリを閉じても、開き直せば続きから案内する。
 
 # 走った記録も見れる
-- 走った後に、iPhoneの記録をMacに取り出せる（app/ で）
+- 走った後に、iPhone をケーブルでつなぎ、app/ で次を動かすと、記録を Mac の `tiles/data/ride-logs/` に取り出せる（まだ取り出していない分だけ）
 ```
-xcrun devicectl device copy from --device <iPhone の UDID> --domain-type appDataContainer --domain-identifier dev.testmap.cubnavigation2 --source Documents/navigation-log.txt --destination navigation-log.txt
+npm run logs
 ```
+- 走行ごとに `<出発の日時>.jsonl`（例 `2026-11-27-130301.jsonl`）ができる。走った位置・ナビの判断・計算し直したルートなど、取れるものはすべて入っている（中身は設計書 3.1）
+- `navigation-log.txt` は、案内・計算し直しなどの出来事だけの記録
+- 記録には家の場所なども入る。`tiles/data/` は git に入らないので、GitHub には上がらない
+- iPhone が 2 台以上つながっているときは、`IPHONE_UDID=<iPhone の UDID> npm run logs` で選ぶ
 - iPhoneのUUIDの調べ方
 ```
 xcrun devicectl list devices

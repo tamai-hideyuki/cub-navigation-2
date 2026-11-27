@@ -5,15 +5,21 @@
 import { File, Paths } from 'expo-file-system';
 import * as Location from 'expo-location';
 import * as TaskManager from 'expo-task-manager';
-import { AppState } from 'react-native';
+import { AppState, Platform } from 'react-native';
 
-import { isOpen, openTiles, route as routeOnDevice } from '../../modules/cub-routing';
+import {
+  isOpen,
+  memoryFootprintMegabytes,
+  openTiles,
+  route as routeOnDevice,
+} from '../../modules/cub-routing';
 import { enqueueClips, prepareAudio } from '../clip-player';
-import { installedOsmDate } from '../data/manifest';
+import { installedOsmDate, readInstalledData } from '../data/manifest';
 import { toLocationReading } from '../location-reading';
-import { writeLog } from '../log';
+import { closeTripLog, isTripLogOpen, openTripLog, writeLog, writeTripLog } from '../log';
 import { initialState, step } from '../navigation/navigator';
 import {
+  DEFAULT_REROUTE_CONFIGURATION,
   EMPTY_REROUTE_HISTORY,
   shouldReroute,
   type RerouteHistory,
@@ -21,12 +27,20 @@ import {
 import { isNavigationState } from '../navigation/saved-state';
 import {
   COMMON_CLIPS,
+  DEFAULT_CONFIGURATION,
   type LocationReading,
   type NavigationState,
   type Route,
 } from '../navigation/types';
 import { buildRouteRequest, summarizeRouteResponse, type Coordinate } from '../routing/request';
 import { audioClipIds, routeFromValhalla } from '../routing/route-from-valhalla';
+import {
+  navigationRecord,
+  routeRecord,
+  routeStartOffsetMeters,
+  TRIP_LOG_SCHEMA_VERSION,
+  tripLogFileName,
+} from './trip-log-format';
 
 export const TRIP_TASK_NAME = 'cub-navigation-2-trip';
 
@@ -38,7 +52,14 @@ const STATE_FILE = new File(Paths.document, 'trip-state.json');
 /** 着いてからこの時間たったら、位置の取得を止める（電池のため）。画面は「着きました」のまま */
 const STOP_AFTER_ARRIVAL_MILLISECONDS = 120_000;
 
-export type PlannedRoute = { route: Route; totalSeconds: number };
+export type PlannedRoute = {
+  route: Route;
+  totalSeconds: number;
+  /** Valhalla に渡した要求と、答えそのもの（走行ごとの記録に残す） */
+  request: ReturnType<typeof buildRouteRequest>;
+  response: unknown;
+  milliseconds: number;
+};
 
 export type Trip = {
   destination: Coordinate;
@@ -52,6 +73,8 @@ export type Trip = {
   arrivedAtMilliseconds: number | null;
   /** 最後に計算し直せなかったとき true（画面の帯を赤にする） */
   lastRerouteFailed: boolean;
+  /** 走行ごとの記録のファイル名（Documents/logs/ の中。設計書 3.1） */
+  logFileName: string | null;
 };
 
 /** ルートが見つからない（行けない・範囲の外）。Valhalla の 442 など */
@@ -77,9 +100,10 @@ export async function planRoute(
   headingDegrees: number | null = null,
 ): Promise<PlannedRoute> {
   await ensureTilesOpen();
+  const request = buildRouteRequest(origin, destination, { headingDegrees });
   let result;
   try {
-    result = await routeOnDevice(buildRouteRequest(origin, destination, { headingDegrees }));
+    result = await routeOnDevice(request);
   } catch (error) {
     const message = String(error);
     if (/442|No path|No suitable edges|outside/i.test(message)) throw new NoRouteError(message);
@@ -96,7 +120,13 @@ export async function planRoute(
     maneuvers: route.maneuvers.length,
     milliseconds: Math.round(result.milliseconds),
   });
-  return { route, totalSeconds: summarizeRouteResponse(result.response).minutes * 60 };
+  return {
+    route,
+    totalSeconds: summarizeRouteResponse(result.response).minutes * 60,
+    request,
+    response: result.response,
+    milliseconds: result.milliseconds,
+  };
 }
 
 function saveRoute(): void {
@@ -108,6 +138,7 @@ function saveRoute(): void {
         destination: trip.destination,
         route: trip.route,
         totalSeconds: trip.totalSeconds,
+        logFileName: trip.logFileName,
       }),
     );
   } catch (error) {
@@ -163,7 +194,12 @@ function loadTrip(): Trip | null {
       arrived: rest.arrived ?? false,
       arrivedAtMilliseconds: rest.arrivedAtMilliseconds ?? null,
       lastRerouteFailed: rest.lastRerouteFailed ?? false,
+      logFileName: typeof saved.logFileName === 'string' ? saved.logFileName : null,
     };
+    if (trip.logFileName !== null && !isTripLogOpen()) {
+      openTripLog(trip.logFileName);
+      writeTripLog('trip-log-reopen', { arrived: trip.arrived, appState: AppState.currentState });
+    }
     // 保存したルートが前の地図で引いたものなら、新しい地図で引き直す（設計書 9.3）
     mapChanged =
       !trip.arrived &&
@@ -180,6 +216,14 @@ function loadTrip(): Trip | null {
 async function reroute(reading: LocationReading, headingDegrees: number | null): Promise<void> {
   if (!trip) return;
   const started = Date.now();
+  writeTripLog('reroute-request', {
+    origin: { longitude: reading.longitude, latitude: reading.latitude },
+    headingDegrees,
+    readingTimestamp: reading.timestampMilliseconds,
+    offRoute: trip.state.offRoute,
+    progress: trip.state.progress,
+    previousRouteComputedAt: trip.route.source.computedAt,
+  });
   try {
     const planned = await planRoute(
       { longitude: reading.longitude, latitude: reading.latitude },
@@ -198,6 +242,10 @@ async function reroute(reading: LocationReading, headingDegrees: number | null):
       lastRerouteFailed: false,
     };
     saveRoute();
+    logRoute('reroute', planned, {
+      longitude: reading.longitude,
+      latitude: reading.latitude,
+    });
     writeLog('reroute', {
       milliseconds: Date.now() - started,
       count: trip.rerouteCount,
@@ -217,13 +265,34 @@ async function reroute(reading: LocationReading, headingDegrees: number | null):
 
 async function handleLocations(locations: Location.LocationObject[]): Promise<void> {
   const current = loadTrip();
-  if (!current || busy) return;
+  const receivedAt = Date.now();
+  // 位置の束が届いた時刻と、中の位置の時刻の差で、iOS がまとめて遅れて渡していないかが分かる
+  writeTripLog('locations', {
+    count: locations.length,
+    firstTimestamp: locations[0]?.timestamp ?? null,
+    lastTimestamp: locations.at(-1)?.timestamp ?? null,
+    delayMilliseconds: locations.length > 0 ? receivedAt - locations.at(-1)!.timestamp : null,
+    dropped: !current ? 'no-trip' : busy ? 'busy' : null,
+    appState: AppState.currentState,
+    memoryMegabytes: Math.round(memoryFootprintMegabytes()),
+  });
+  if (!current || busy) {
+    // 使わない位置も、届いたものは残す
+    for (const location of locations)
+      writeTripLog('location', { ...rawLocation(location), dropped: true });
+    return;
+  }
   busy = true;
   try {
     for (const location of locations) {
       if (!trip) break;
       const reading = toLocationReading(location);
+      const before = trip.state;
       const output = step(trip.route, trip.state, reading);
+      writeTripLog('location', {
+        ...rawLocation(location),
+        navigation: navigationRecord(before, output),
+      });
       const audio = audioClipIds(trip.route, output.clipIds);
       const justArrived = !trip.arrived && audio.includes(COMMON_CLIPS.arrive);
       trip = {
@@ -248,6 +317,7 @@ async function handleLocations(locations: Location.LocationObject[]): Promise<vo
           STOP_AFTER_ARRIVAL_MILLISECONDS
       ) {
         await stopLocationUpdates();
+        stopHeadingLog();
         writeLog('trip-location-stopped-after-arrival');
         break;
       }
@@ -264,6 +334,56 @@ async function handleLocations(locations: Location.LocationObject[]): Promise<vo
   } finally {
     busy = false;
   }
+}
+
+/** iOS から届いた位置の、すべての項目（加工しない） */
+function rawLocation(location: Location.LocationObject): Record<string, unknown> {
+  return { timestamp: location.timestamp, mocked: location.mocked ?? null, ...location.coords };
+}
+
+/** 引いたルートを、Valhalla の要求と答えごと走行ごとの記録に残す */
+function logRoute(reason: 'start' | 'reroute', planned: PlannedRoute, origin: Coordinate): void {
+  writeTripLog('route', {
+    reason,
+    route: routeRecord(planned.route),
+    startOffsetMeters: routeStartOffsetMeters(origin, planned.route),
+    firstManeuver: planned.route.maneuvers[0]
+      ? {
+          id: planned.route.maneuvers[0].id,
+          distanceAlongMeters: planned.route.maneuvers[0].distanceAlongMeters,
+          direction: planned.route.maneuvers[0].direction,
+        }
+      : null,
+    milliseconds: Math.round(planned.milliseconds),
+    request: planned.request,
+    response: planned.response,
+  });
+}
+
+// 画面を付けた・消した（AppState）。位置の束の appState と合わせて、いつ画面が消えていたかが分かる
+AppState.addEventListener('change', (state) => writeTripLog('app-state', { state }));
+
+// 方位磁針の向き（進む向き heading とは別）。動いていないときの向きや、heading のずれを後で比べるため
+let headingSubscription: Location.LocationSubscription | null = null;
+let lastHeadingLogMilliseconds = 0;
+
+async function startHeadingLog(): Promise<void> {
+  if (headingSubscription !== null) return;
+  try {
+    headingSubscription = await Location.watchHeadingAsync((heading) => {
+      const now = Date.now();
+      if (now - lastHeadingLogMilliseconds < 1000) return; // 1秒に1件まで
+      lastHeadingLogMilliseconds = now;
+      writeTripLog('compass', { ...heading, appState: AppState.currentState });
+    });
+  } catch (error) {
+    writeTripLog('compass-error', { message: String(error) });
+  }
+}
+
+function stopHeadingLog(): void {
+  headingSubscription?.remove();
+  headingSubscription = null;
 }
 
 TaskManager.defineTask<{ locations: Location.LocationObject[] }>(
@@ -299,10 +419,29 @@ export async function startTrip(destination: Coordinate, planned: PlannedRoute):
     arrived: false,
     arrivedAtMilliseconds: null,
     lastRerouteFailed: false,
+    logFileName: tripLogFileName(new Date()),
   };
+  openTripLog(trip.logFileName!);
+  writeTripLog('trip-log-start', {
+    schemaVersion: TRIP_LOG_SCHEMA_VERSION,
+    destination,
+    platform: { os: Platform.OS, version: Platform.Version, constants: Platform.constants },
+    installedData: readInstalledData().manifest,
+    permissions: {
+      foreground: await Location.getForegroundPermissionsAsync(),
+      background: await Location.getBackgroundPermissionsAsync(),
+    },
+    navigationConfiguration: DEFAULT_CONFIGURATION,
+    rerouteConfiguration: DEFAULT_REROUTE_CONFIGURATION,
+    stopAfterArrivalMilliseconds: STOP_AFTER_ARRIVAL_MILLISECONDS,
+    memoryMegabytes: Math.round(memoryFootprintMegabytes()),
+  });
+  const origin = planned.request.locations[0];
+  logRoute('start', planned, { longitude: origin.lon, latitude: origin.lat });
   saveRoute();
   saveState();
   await startLocationUpdates();
+  await startHeadingLog();
   writeLog('trip-start', { kilometers: Math.round(planned.route.totalMeters / 100) / 10 });
 }
 
@@ -326,6 +465,7 @@ export async function resumeTripIfNeeded(): Promise<void> {
   if (await Location.hasStartedLocationUpdatesAsync(TRIP_TASK_NAME)) return;
   await prepareAudio();
   await startLocationUpdates();
+  await startHeadingLog();
   writeLog('trip-resume');
 }
 
@@ -337,6 +477,7 @@ async function stopLocationUpdates(): Promise<void> {
 
 export async function stopTrip(): Promise<void> {
   await stopLocationUpdates();
+  stopHeadingLog();
   trip = null;
   for (const file of [ROUTE_FILE, STATE_FILE]) {
     try {
@@ -346,6 +487,7 @@ export async function stopTrip(): Promise<void> {
     }
   }
   writeLog('trip-stop');
+  closeTripLog();
 }
 
 /** 画面に出すための、今の走行（無ければ null） */

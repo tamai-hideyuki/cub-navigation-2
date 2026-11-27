@@ -80,11 +80,13 @@ xcrun devicectl device copy to --device <UDID> --domain-type appDataContainer --
 
 `Documents/navigation-log.txt` に1行1件の JSON で残る。`probe-route` の `appState` が `background` なら、画面ロック中に計算できている。
 
+走行中は、走行ごとの記録 `Documents/logs/<出発の日時>.jsonl` にも、位置 1 件ごとの値やルートなど、取れるものをすべて残す（[設計書 3.1](../docs/design.md#31-走行の記録2026-11-27)）。どちらも次で `tiles/data/ride-logs/` に取り出せる（まだ取り出していない分だけ）。
+
 ```bash
-xcrun devicectl device copy from --device <iPhone の UDID> \
-  --domain-type appDataContainer --domain-identifier dev.testmap.cubnavigation2 \
-  --source Documents/navigation-log.txt --destination navigation-log.txt
+npm run logs
 ```
+
+シミュレーターからは `../tools/pull-logs.sh --simulator`（`tiles/data/ride-logs/simulator/` に写す）。
 
 ## ビルド
 

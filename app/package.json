@@ -27,10 +27,11 @@
     "android": "expo run:android",
     "ios": "expo run:ios",
     "iphone": "../tools/install-iphone.sh",
+    "logs": "../tools/pull-logs.sh",
     "web": "expo start --web",
     "lint": "expo lint",
-    "test": "node --test src/*.test.ts src/navigation/*.test.ts src/routing/*.test.ts src/map/*.test.ts src/data/*.test.ts src/search/*.test.ts src/voice/*.test.ts src/poc6/*.test.ts",
-    "test:update-snapshots": "node --test --test-update-snapshots src/*.test.ts src/navigation/*.test.ts src/routing/*.test.ts src/map/*.test.ts src/data/*.test.ts src/search/*.test.ts src/voice/*.test.ts src/poc6/*.test.ts",
+    "test": "node --test src/*.test.ts src/navigation/*.test.ts src/routing/*.test.ts src/map/*.test.ts src/data/*.test.ts src/trip/*.test.ts src/search/*.test.ts src/voice/*.test.ts src/poc6/*.test.ts",
+    "test:update-snapshots": "node --test --test-update-snapshots src/*.test.ts src/navigation/*.test.ts src/routing/*.test.ts src/map/*.test.ts src/data/*.test.ts src/trip/*.test.ts src/search/*.test.ts src/voice/*.test.ts src/poc6/*.test.ts",
     "format": "npx --yes prettier@3.6.2 --write \"*.{ts,tsx,js}\" \"src/**/*.{ts,tsx}\" \"modules/**/*.ts\""
   },
   "private": true
