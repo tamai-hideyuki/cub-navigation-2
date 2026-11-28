@@ -41,6 +41,7 @@ import {
   TRIP_LOG_SCHEMA_VERSION,
   tripLogFileName,
 } from './trip-log-format';
+import { tripAfterReroute, tripAfterRerouteFailure } from './trip-reroute';
 
 export const TRIP_TASK_NAME = 'cub-navigation-2-trip';
 
@@ -215,6 +216,8 @@ function loadTrip(): Trip | null {
 
 async function reroute(reading: LocationReading, headingDegrees: number | null): Promise<void> {
   if (!trip) return;
+  // 計算の間に「停止」が押されたり、別の走行が始まったりしたかを、計算の後で確かめるため
+  const startedTrip = trip;
   const started = Date.now();
   writeTripLog('reroute-request', {
     origin: { longitude: reading.longitude, latitude: reading.latitude },
@@ -224,43 +227,46 @@ async function reroute(reading: LocationReading, headingDegrees: number | null):
     progress: trip.state.progress,
     previousRouteComputedAt: trip.route.source.computedAt,
   });
+  let planned: PlannedRoute;
   try {
-    const planned = await planRoute(
+    planned = await planRoute(
       { longitude: reading.longitude, latitude: reading.latitude },
       trip.destination,
       headingDegrees,
     );
-    const state = initialState(planned.route);
-    // 計算し直したときは「案内を始めます」を鳴らさず、「ルートを計算し直しました」を鳴らす
-    trip = {
-      ...trip,
-      route: planned.route,
-      totalSeconds: planned.totalSeconds,
-      state: { ...state, playedClipIds: [COMMON_CLIPS.start] },
-      reroute: { lastAttemptMilliseconds: reading.timestampMilliseconds, lastAttemptFailed: false },
-      rerouteCount: trip.rerouteCount + 1,
-      lastRerouteFailed: false,
-    };
-    saveRoute();
-    logRoute('reroute', planned, {
-      longitude: reading.longitude,
-      latitude: reading.latitude,
-    });
-    writeLog('reroute', {
-      milliseconds: Date.now() - started,
-      count: trip.rerouteCount,
-      appState: AppState.currentState,
-    });
-    await enqueueClips(['common-rerouted']);
   } catch (error) {
-    trip = {
-      ...trip,
-      reroute: { lastAttemptMilliseconds: reading.timestampMilliseconds, lastAttemptFailed: true },
-      lastRerouteFailed: true,
-    };
+    const failed = tripAfterRerouteFailure(startedTrip, trip, reading.timestampMilliseconds);
+    if (!failed) {
+      writeLog('reroute-discarded', { reason: discardReason(), message: String(error) });
+      return;
+    }
+    trip = failed;
     writeLog('reroute-error', { message: String(error), appState: AppState.currentState });
     await enqueueClips(['common-no-route']);
+    return;
   }
+  const rerouted = tripAfterReroute(startedTrip, trip, planned, reading.timestampMilliseconds);
+  if (!rerouted) {
+    writeLog('reroute-discarded', { reason: discardReason() });
+    return;
+  }
+  trip = rerouted;
+  saveRoute();
+  logRoute('reroute', planned, {
+    longitude: reading.longitude,
+    latitude: reading.latitude,
+  });
+  writeLog('reroute', {
+    milliseconds: Date.now() - started,
+    count: trip.rerouteCount,
+    appState: AppState.currentState,
+  });
+  await enqueueClips(['common-rerouted']);
+}
+
+/** 計算し直した結果を捨てた理由（走行ごとの記録に残す） */
+function discardReason(): 'trip-stopped' | 'trip-replaced' {
+  return trip === null ? 'trip-stopped' : 'trip-replaced';
 }
 
 async function handleLocations(locations: Location.LocationObject[]): Promise<void> {
